@@ -1,0 +1,121 @@
+/* Volumen color identity: overrides blades' --pico-primary* variables */
+[data-theme='light'],
+:root:not([data-theme='dark']) {
+  --pico-primary: #1d6b4a;
+  --pico-primary-background: #1d6b4a;
+  --pico-primary-border: var(--pico-primary-background);
+  --pico-primary-underline: rgba(29, 107, 74, 0.5);
+  --pico-primary-hover: #154f37;
+  --pico-primary-hover-background: #175d40;
+  --pico-primary-hover-border: var(--pico-primary-hover-background);
+  --pico-primary-hover-underline: var(--pico-primary-hover);
+  --pico-primary-focus: rgba(29, 158, 107, 0.5);
+  --pico-primary-inverse: #fff;
+}
+
+@media only screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --pico-primary: #3ecf8e;
+    --pico-primary-background: #1d6b4a;
+    --pico-primary-border: var(--pico-primary-background);
+    --pico-primary-underline: rgba(62, 207, 142, 0.5);
+    --pico-primary-hover: #7fe0b6;
+    --pico-primary-hover-background: #248c5f;
+    --pico-primary-hover-border: var(--pico-primary-hover-background);
+    --pico-primary-hover-underline: var(--pico-primary-hover);
+    --pico-primary-focus: rgba(62, 207, 142, 0.375);
+    --pico-primary-inverse: #fff;
+  }
+}
+
+[data-theme='dark'] {
+  --pico-primary: #3ecf8e;
+  --pico-primary-background: #1d6b4a;
+  --pico-primary-border: var(--pico-primary-background);
+  --pico-primary-underline: rgba(62, 207, 142, 0.5);
+  --pico-primary-hover: #7fe0b6;
+  --pico-primary-hover-background: #248c5f;
+  --pico-primary-hover-border: var(--pico-primary-hover-background);
+  --pico-primary-hover-underline: var(--pico-primary-hover);
+  --pico-primary-focus: rgba(62, 207, 142, 0.375);
+  --pico-primary-inverse: #fff;
+}
+
+.rule-pass {
+  color: #1d6b4a;
+}
+
+.rule-fail {
+  color: #b3261e;
+}
+
+@media only screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .rule-pass {
+    color: var(--pico-primary-hover);
+  }
+
+  :root:not([data-theme]) .rule-fail {
+    color: #ff8a80;
+  }
+
+  :root:not([data-theme]) .import-errors {
+    color: #ff8a80;
+    border-color: #ff8a80;
+  }
+}
+
+[data-theme='dark'] .rule-pass {
+  color: var(--pico-primary-hover);
+}
+
+[data-theme='dark'] .rule-fail {
+  color: #ff8a80;
+}
+
+[data-theme='dark'] .import-errors {
+  color: #ff8a80;
+  border-color: #ff8a80;
+}
+
+.import-errors {
+  color: #b3261e;
+  border: 1px solid #b3261e;
+  border-radius: 0.25rem;
+  padding: 0.75rem 1rem;
+}
+
+[data-testid='exercise-table'] input[type='number'],
+[data-testid='exercise-table'] input[type='text'] {
+  width: 5.5rem;
+  min-width: 4rem;
+}
+
+/* Plain horizontal scroll on overflow, without blades' `.responsive`
+   full-bleed centering trick (margin-left: 50%; transform: translateX(-50%)),
+   which assumes the table breaks out of a narrow content column. Here the
+   table already sits inside a normally-padded card, so that trick just
+   leaves a stray gap on its left. */
+[data-testid='exercise-table'],
+[data-testid='muscle-volume-table'] {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* blades sets th to vertical-align: bottom while td is top, misaligning
+   row headers (exercise/muscle name) against their sibling cells */
+table th[scope='row'] {
+  vertical-align: top;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

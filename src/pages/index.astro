@@ -1,0 +1,31 @@
+---
+import ProgramBuilder from '../components/ProgramBuilder';
+import '../styles/theme.css';
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<link rel="stylesheet" href="
+          https://cdn.jsdelivr.net/npm/@anyblades/blades@2/css/blades.min.css
+        "/>
+		<link rel="stylesheet" href="
+          https://cdn.jsdelivr.net/npm/@anyblades/blades@2/css/responsive-table.min.css
+        "/>
+
+		<title>Volumen — program builder</title>
+	</head>
+	<body>
+		<noscript>
+			<header class="container">
+				<h1>Volumen</h1>
+				<p>Build a strength training program aligned with the 2026 ACSM recommendations.</p>
+			</header>
+		</noscript>
+		<ProgramBuilder client:load />
+	</body>
+</html>

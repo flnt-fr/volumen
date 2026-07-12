@@ -1,0 +1,130 @@
+{
+  "source": {
+    "title": "Resistance Training Prescription for Muscle Function, Hypertrophy, and Physical Performance in Healthy Adults: An Overview of Reviews",
+    "organization": "American College of Sports Medicine (ACSM)",
+    "publication": "Medicine & Science in Sports & Exercise",
+    "publishedDate": "2026-04",
+    "announcedDate": "2026-03-16",
+    "previousVersion": "2009",
+    "evidenceBase": {
+      "systematicReviewsCount": 137,
+      "participantsCount": 30000,
+      "methodology": "Umbrella review using the GRADE (Grading of Recommendations Assessment, Development and Evaluation) framework"
+    },
+    "url": "https://journals.lww.com/acsm-msse/fulltext/2026/04000/american_college_of_sports_medicine_position.21.aspx"
+  },
+  "coreMessage": "The most meaningful gains come from a simple shift: moving from no resistance training to any form of resistance training. Training all major muscle groups at least twice a week matters far more than chasing the perfect prescription.",
+  "trainingGoals": [
+    {
+      "id": "strength",
+      "name": "Strength",
+      "definition": "How much weight a person can lift",
+      "load": {
+        "percentOf1RM": {
+          "min": 80,
+          "max": null
+        }
+      },
+      "volume": {
+        "setsPerExercise": {
+          "min": 2,
+          "max": 3
+        }
+      },
+      "frequency": {
+        "sessionsPerWeekMin": 2
+      },
+      "keyPrinciples": [
+        "Perform key/primary lifts at the beginning of the session",
+        "Use full range of motion",
+        "Training to absolute failure is not required"
+      ]
+    },
+    {
+      "id": "hypertrophy",
+      "name": "Hypertrophy (Muscle Growth)",
+      "definition": "Increasing the size and volume of muscle",
+      "load": {
+        "percentOf1RM": {
+          "min": 30,
+          "max": 100,
+          "note": "Broad loading spectrum is effective provided each set is taken close to failure"
+        }
+      },
+      "volume": {
+        "setsPerMuscleGroupPerWeek": {
+          "min": 10
+        }
+      },
+      "keyPrinciples": [
+        "Total weekly set volume is the primary driver of muscle growth",
+        "Eccentric overload (the lowering/negative phase) is favorable for hypertrophy",
+        "Training to absolute failure is not required; stopping at 2-3 reps in reserve produces comparable outcomes with less fatigue"
+      ]
+    },
+    {
+      "id": "power",
+      "name": "Power",
+      "definition": "How fast a person can move a given load",
+      "load": {
+        "percentOf1RM": {
+          "min": 30,
+          "max": 70
+        }
+      },
+      "keyPrinciples": [
+        "Move the load as fast as possible during the concentric phase",
+        "Comparable to Olympic weightlifting-style intent",
+        "Can be trained safely with simple movements: fast sit-to-stands, step-ups, medicine ball throws, jump variations, kettlebell swings"
+      ]
+    },
+    {
+      "id": "generalHealthMovement",
+      "name": "General Health / Functional Movement",
+      "definition": "Improving everyday function such as gait speed and balance",
+      "load": {
+        "note": "Light loads"
+      },
+      "keyPrinciples": [
+        "Use fast lifting technique (\"Power RT\") rather than heavy loading",
+        "Targets walking speed and balance",
+        "Particularly relevant for aging adults: muscular power declines faster than strength, often starting in the 4th-5th decade of life"
+      ]
+    }
+  ],
+  "debunkedMyths": [
+    {
+      "id": "trainingToFailure",
+      "name": "The Fatigue Myth",
+      "oldBelief": "Training must be taken to muscular failure to maximize strength or size gains",
+      "currentEvidence": "Training to absolute failure is not necessary for strength or hypertrophy outcomes. Stopping 2-3 reps short of failure produces similar results with less fatigue and lower injury risk."
+    },
+    {
+      "id": "equipmentComplexity",
+      "name": "The Fancy Gym/Equipment Myth",
+      "oldBelief": "Different equipment types (machines vs free weights) and increasing exercise complexity/variety are necessary for progress",
+      "currentEvidence": "For most healthy adults, equipment type and exercise complexity do not significantly impact results."
+    },
+    {
+      "id": "beginnerVsAdvanced",
+      "name": "The Beginners vs Advanced Myth",
+      "oldBelief": "Beginners and advanced trainees require fundamentally different exercises and program structures",
+      "currentEvidence": "Basic/foundational exercises are effective for everyone; training experience has little impact on the effectiveness of a given exercise."
+    }
+  ],
+  "progressiveOverloadMethods": [
+    "Increasing resistance or load",
+    "Increasing repetitions or sets",
+    "Improving movement quality or control",
+    "Reducing rest intervals",
+    "Increasing movement speed or power output"
+  ],
+  "generalRecommendations": {
+    "minMuscleGroupFrequencyPerWeek": 2,
+    "notes": [
+      "Exercises performed earlier in a session tend to show greater improvement; prioritize what matters most early in the workout",
+      "Consistency and adherence matter more than precise program optimization",
+      "Resistance training benefits extend beyond muscle: healthspan, longevity, metabolic function, injury prevention, and long-term functional independence"
+    ]
+  }
+}
