@@ -3,6 +3,9 @@ const en = {
 
   'localeSwitcher.label': 'Language',
 
+  'footer.about': 'About',
+  'footer.legal': 'Legal notice',
+
   'goalSelector.heading': 'Training goal',
   'goalSelector.label': 'Training goal',
 

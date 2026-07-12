@@ -5,6 +5,9 @@ const fr: Partial<Record<TranslationKey, string>> = {
 
   'localeSwitcher.label': 'Langue',
 
+  'footer.about': 'À propos',
+  'footer.legal': 'Mentions légales',
+
   'goalSelector.heading': 'Objectif d\'entraînement',
   'goalSelector.label': 'Objectif d\'entraînement',
 

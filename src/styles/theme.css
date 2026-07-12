@@ -94,12 +94,62 @@
    full-bleed centering trick (margin-left: 50%; transform: translateX(-50%)),
    which assumes the table breaks out of a narrow content column. Here the
    table already sits inside a normally-padded card, so that trick just
-   leaves a stray gap on its left. */
+   leaves a stray gap on its left.
+
+   `overflow-x: auto` alone does not reliably contain a <table>'s scrollable
+   overflow: a table's internal auto-layout sizing can still leak its full
+   (unclipped) intrinsic width into the document's scrollable area, causing
+   page-wide horizontal scroll even though the table itself visually clips
+   and scrolls correctly (confirmed via document.documentElement.scrollWidth
+   growing past clientWidth at 375px). `contain: paint` forces the table to
+   establish a real clipping/containing boundary so the overflow stays local
+   to the table's own scroll container. */
 [data-testid='exercise-table'],
-[data-testid='muscle-volume-table'] {
+[data-testid='muscle-volume-table'],
+[data-testid='muscle-group-volume-table'],
+[data-testid='muscle-contribution-table'] {
   display: block;
   max-width: 100%;
   overflow-x: auto;
+  contain: paint;
+}
+
+/* blades' `body>header,body>main,body>footer{padding-block:...}` rule only
+   matches when these are DIRECT children of <body>. On the home page they're
+   rendered by React inside <astro-island>, so the real DOM is
+   `body > astro-island > header`/`main` and the rule never matches, leaving
+   zero top padding. Re-assert the same padding regardless of nesting depth;
+   on the static pages (/about, /legal, /404) this just restates the value
+   blades' own rule already applies, so it doesn't double up. */
+header.container,
+main.container,
+footer.container {
+  padding-block: var(--pico-block-spacing-vertical);
+}
+
+/* blades' disabled-button styling is opacity-based dimming, which on the
+   exercise-picker "Add" button leaves near-white text on a washed-out sage
+   background — hard to read in light theme. Use an explicit muted
+   background/text pair instead of relying on opacity, for both themes. */
+[data-testid='exercise-picker-add-button']:disabled {
+  opacity: 1;
+  background-color: #b7bcc4;
+  border-color: #b7bcc4;
+  color: #2b2f36;
+}
+
+@media only screen and (prefers-color-scheme: dark) {
+  :root:not([data-theme]) [data-testid='exercise-picker-add-button']:disabled {
+    background-color: #5a6270;
+    border-color: #5a6270;
+    color: #e4e6eb;
+  }
+}
+
+[data-theme='dark'] [data-testid='exercise-picker-add-button']:disabled {
+  background-color: #5a6270;
+  border-color: #5a6270;
+  color: #e4e6eb;
 }
 
 /* blades sets th to vertical-align: bottom while td is top, misaligning

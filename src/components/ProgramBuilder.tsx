@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import AppFooter from './AppFooter';
 import AppHeader from './AppHeader';
 import ExportImportBar from './ExportImportBar';
 import GoalSelector from './GoalSelector';
@@ -62,6 +63,8 @@ export default function ProgramBuilder() {
 
         <ExportImportBar program={program} goal={goal} onImport={setProgram} />
       </main>
+
+      <AppFooter />
     </LocaleProvider>
   );
 }
