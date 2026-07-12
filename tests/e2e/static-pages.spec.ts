@@ -49,3 +49,13 @@ test('/legal links back to the app and lists publisher and hosting details', asy
   await page.getByRole('link', { name: '← Back to the app' }).click();
   await expect(page).toHaveURL(/\/$/);
 });
+
+test('an unknown URL shows the custom 404 page and links back to the app', async ({ page }) => {
+  const response = await page.goto('/this-route-does-not-exist');
+
+  expect(response?.status()).toBe(404);
+  await expect(page.getByRole('heading', { level: 2, name: '404 — Page not found' })).toBeVisible();
+
+  await page.getByRole('link', { name: 'Go to the home page' }).click();
+  await expect(page).toHaveURL(/\/$/);
+});
