@@ -1,6 +1,6 @@
-<emoji> <type>(<scope>): <subject>
+<emoji> <type>(<scope>): <subject, max ~50 chars, imperative mood>
 
-# <body — the why, not the what>
+# <body — the why, not the what. Keep it short: a sentence or two, wrap at 72 chars.>
 
 # --- Conventional Commit types -------------------------------------------
 # feat      a new feature
