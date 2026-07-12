@@ -1,0 +1,40 @@
+<emoji> <type>(<scope>): <subject>
+
+# <body — the why, not the what>
+
+# --- Conventional Commit types -------------------------------------------
+# feat      a new feature
+# fix       a bug fix
+# docs      documentation only
+# style     formatting, missing semicolons, etc. (no code meaning change)
+# refactor  code change that neither fixes a bug nor adds a feature
+# perf      performance improvement
+# test      adding or correcting tests
+# build     build system or external dependencies
+# ci        CI configuration/scripts
+# chore     other changes that don't modify src or test files
+# revert    reverts a previous commit
+#
+# --- Matching gitmoji ------------------------------------------------------
+# ✨ :sparkles:             feat        new feature
+# 🐛 :bug:                  fix         bug fix
+# 🚑️ :ambulance:            fix         critical hotfix
+# 📝 :memo:                 docs        docs
+# 🎨 :art:                  style       structure/format improvement
+# ♻️ :recycle:              refactor    refactor
+# ⚡️ :zap:                  perf        performance
+# ✅ :white_check_mark:     test        tests
+# 👷 :construction_worker:  ci          CI/build pipeline
+# 🔧 :wrench:               chore       config files
+# 📦️ :package:              build       build/packaging
+# ⬆️ :arrow_up:             build       upgrade dependency
+# ⬇️ :arrow_down:           build       downgrade dependency
+# ➕ :heavy_plus_sign:      build       add a dependency
+# ➖ :heavy_minus_sign:     build       remove a dependency
+# 🔥 :fire:                 refactor    remove code/files
+# 🔒️ :lock:                 fix         security fix
+# 💄 :lipstick:             style       UI/visual
+# ⏪️ :rewind:               revert      revert changes
+# 🎉 :tada:                 chore       initial commit
+#
+# Example: ✨ feat(session): add estimated time per exercise
