@@ -144,3 +144,18 @@ npm run test       # unit tests (Vitest)
 npm run test:e2e   # end-to-end tests (Playwright)
 npm run build      # production build
 ```
+
+## Deployment
+
+Volumen builds to a fully static site (`astro build` → `dist/`, no server,
+no adapter) and is deployed at **volumen.flnt.fr** as a static site on
+[Coolify](https://coolify.io/), with no Dockerfile involved:
+
+- **Build command**: `npm run build`
+- **Publish directory**: `dist`
+- **Install command**: `npm ci`
+- Node version is pinned via `.nvmrc` (currently `22`), which Coolify's
+  Nixpacks build picks up automatically.
+
+No environment variables or secrets are required — every dataset the app
+uses is bundled at build time.
