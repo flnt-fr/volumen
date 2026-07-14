@@ -30,8 +30,9 @@ in AI-driven ("vibe") coding, not a reference architecture.
 ## How it was actually built
 
 1. **Bootstrap** — started from the standard Astro minimal template
-   (`npm create astro@latest -- --template minimal`) with the React
-   integration added for interactive components.
+   (`npm create astro@latest -- --template minimal`) with a React
+   integration added for interactive components (later migrated to Preact,
+   see step 9).
 2. **Domain data first** — dropped in two source datasets (see
    [Sources](#sources) below) and asked Claude to model the domain: training
    goals, exercises, and the `Program`/`Session`/`ProgramExercise` shape.
@@ -68,23 +69,63 @@ in AI-driven ("vibe") coding, not a reference architecture.
    a second agent fixed each finding with regression tests, and a third
    independently re-drove the fixed app through real user journeys in a
    browser via Playwright before signing off.
+9. **Preact + Tailwind/daisyUI migration and multi-page split** — a later,
+   larger pass moved the framework from React to **Preact**
+   (`@astrojs/preact`) and the styling from a classless CSS framework to
+   **Tailwind CSS v4 + daisyUI**, with two custom themes (`volumenlight` /
+   `volumendark`, see `src/styles/theme.css`). The single-page app was split
+   into a multi-page site: a static marketing homepage on `/`, the program
+   builder moved to `/app`, plus `/about`, `/legal`, and a custom `/404`,
+   all sharing the same header/footer. The hand-rolled i18n system was
+   extended from the app to these static pages (locale persisted in
+   `localStorage`, resolved from stored choice → browser language →
+   English default). An RGAA/WCAG AA accessibility audit followed, adding
+   `@axe-core/playwright` and an automated a11y test scanning every route in
+   both light and dark themes.
+10. **Review-pipeline-driven UI/UX polish** — a further pass, run through a
+    multi-agent implement-then-review loop, tightened consistency across the
+    app: unified nav/CTA styling and behavior between the static pages and
+    `/app`, put a footer on every page (including `/404`), fixed input
+    visibility/alignment issues, made some sections collapsible, and added a
+    Chart.js radar chart (sets-per-muscle in "Muscle group volume") shown
+    only when the hypertrophy goal is selected.
+11. **Chart sizing and table collapse, with a keyboard-accessibility fix
+    found along the way** — a follow-up request shrank the radar chart to
+    half its original max size and moved the "Muscle group volume" table
+    into a collapsible section below the chart, matching the pattern already
+    used elsewhere. The review loop this ran through caught two regressions
+    before they shipped (a mobile layout where the table's rightmost columns
+    were clipped, and the chart getting stuck at the wrong size after a
+    browser resize), then a third: making the table scrollable by CSS had
+    left it unreachable via keyboard, a real accessibility gap. The fix
+    (`tabindex`/`aria-label` on the scrollable element) was applied
+    consistently across all four tables in the app that share the same
+    scroll-on-overflow pattern, not just the one that was reported.
 
-Testing throughout was Vitest for the domain logic (`src/lib/*.test.ts`) and
-Playwright for end-to-end flows (`tests/e2e/*.spec.ts`), both driven by
-Claude, with the human in the loop reviewing behavior rather than diffs line
-by line.
+Testing throughout was Vitest for the domain logic and i18n
+(`src/lib/*.test.ts`, `src/i18n/*.test.ts`) and Playwright for end-to-end
+flows and accessibility (`tests/e2e/*.spec.ts`), both driven by Claude, with
+the human in the loop reviewing behavior rather than diffs line by line.
 
 ## Stack & credits
 
-- **[Astro](https://astro.build/)** — static-first site framework, hosts a
-  single React island.
-- **[React](https://react.dev/)** — the interactive program builder.
+- **[Astro](https://astro.build/)** — static-first site framework, hosting
+  a handful of Preact islands (the program builder and small interactive
+  pieces like the locale selector) across a multi-page static site.
+- **[Preact](https://preactjs.com/)** (via `@astrojs/preact`) — the
+  interactive program builder and other islands.
+- **[Tailwind CSS](https://tailwindcss.com/) v4 + [daisyUI](https://daisyui.com/)**
+  — utility-first styling with two custom themes (`volumenlight` /
+  `volumendark`) in `src/styles/theme.css`.
+- **[Chart.js](https://www.chartjs.org/)** — the sets-per-muscle radar
+  chart shown for the hypertrophy goal.
 - **[Zod](https://zod.dev/)** — schema validation for the localStorage
   program shape and the export/import JSON file format.
-- **[@anyblades/blades](https://github.com/anyblades/blades)** — the
-  classless/Pico-inspired CSS framework used for base styling.
-- **[Vitest](https://vitest.dev/)** — unit tests for the domain logic.
-- **[Playwright](https://playwright.dev/)** — end-to-end browser tests.
+- **[Vitest](https://vitest.dev/)** — unit tests for the domain logic and
+  i18n.
+- **[Playwright](https://playwright.dev/)** + **[@axe-core/playwright](https://github.com/dequelabs/axe-core-npm)**
+  — end-to-end browser tests and automated accessibility (RGAA/WCAG AA)
+  scans.
 - **[TypeScript](https://www.typescriptlang.org/)** throughout.
 - **[Claude](https://www.anthropic.com/claude) (Anthropic)**, via
   **[Claude Code](https://claude.com/claude-code)** — wrote the entire

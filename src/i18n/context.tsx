@@ -1,9 +1,9 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, type ComponentChildren } from 'preact';
+import { useContext, useEffect, useState } from 'preact/hooks';
 import { t } from './t';
 import type { TranslationKey } from './strings.en';
-import { DEFAULT_LOCALE, isLocale, type Locale } from './types';
-
-const LOCALE_STORAGE_KEY = 'volumen:locale';
+import { DEFAULT_LOCALE, type Locale } from './types';
+import { resolveInitialLocale, setStoredLocale } from './localeStore';
 
 interface LocaleContextValue {
   locale: Locale;
@@ -15,23 +15,29 @@ const LocaleContext = createContext<LocaleContextValue>({
   setLocale: () => {},
 });
 
-function loadLocale(): Locale {
-  if (typeof window === 'undefined') return DEFAULT_LOCALE;
-  const stored = window.localStorage.getItem(LOCALE_STORAGE_KEY);
-  return isLocale(stored) ? stored : DEFAULT_LOCALE;
-}
-
-export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocale] = useState<Locale>(DEFAULT_LOCALE);
+export function LocaleProvider({ children }: { children: ComponentChildren }) {
+  // Resolved lazily (in useState's initializer, not an effect): the whole
+  // /app body is one client:load island with no static SSR content to
+  // protect, so resolveInitialLocale() — which only touches
+  // localStorage/navigator.language, both available synchronously at
+  // construction time in the browser (guarded for SSR in localeStore.ts) —
+  // can run before the very first render, removing the
+  // render-English-then-correct-to-French flash entirely. It must NOT
+  // persist to localStorage here, or an auto-detected browser language would
+  // get silently "locked in" as if the user had explicitly chosen it.
+  // Persisting only happens through setLocale below, mirroring
+  // LocaleSelect.tsx's behavior on the static pages (see
+  // src/i18n/localeStore.ts).
+  const [locale, setLocaleState] = useState<Locale>(() => resolveInitialLocale());
 
   useEffect(() => {
-    setLocale(loadLocale());
-  }, []);
-
-  useEffect(() => {
-    window.localStorage.setItem(LOCALE_STORAGE_KEY, locale);
     document.documentElement.lang = locale;
   }, [locale]);
+
+  function setLocale(next: Locale) {
+    setLocaleState(next);
+    setStoredLocale(next);
+  }
 
   return <LocaleContext.Provider value={{ locale, setLocale }}>{children}</LocaleContext.Provider>;
 }

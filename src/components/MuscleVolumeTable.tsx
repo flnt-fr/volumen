@@ -18,7 +18,12 @@ export default function MuscleVolumeTable({ session }: MuscleVolumeTableProps) {
   }
 
   return (
-    <table data-testid="muscle-volume-table">
+    <table
+      className="table"
+      data-testid="muscle-volume-table"
+      tabIndex={0}
+      aria-label={t('muscleVolume.caption', { name: session.name })}
+    >
       <caption className="sr-only">{t('muscleVolume.caption', { name: session.name })}</caption>
       <thead>
         <tr>

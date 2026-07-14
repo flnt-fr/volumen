@@ -4,6 +4,8 @@ import {
   addSession,
   exerciseRows,
   gotoApp,
+  openMuscleContributionTable,
+  openMuscleGroupVolumeTable,
   openMuscleVolumeTable,
   muscleVolumeTable,
   renameSession,
@@ -77,18 +79,20 @@ test('full journey: goal, sessions, exercises, muscle volume, compliance', async
   await expect(complianceCard.getByText(/2 session\(s\) scheduled, compliant/)).toBeVisible();
   await expect(complianceCard.getByText(/Barbell Bench Press.*compliant/)).toBeVisible();
   await expect(complianceCard.getByText(/Barbell Squat.*compliant/)).toBeVisible();
-  await expect(complianceCard.locator('.rule-fail')).toHaveCount(0);
+  await expect(complianceCard.locator('.text-error')).toHaveCount(0);
 
   // 6. The strength goal has no muscle-group volume rule, so the dedicated
   //    table shows the "no rule" message instead of a table.
   await expect(page.getByTestId('muscle-group-volume-empty-message')).toBeVisible();
 
   // 7. Each session's table lists its own exercises' direct/weighted-secondary set contribution.
+  await openMuscleContributionTable(push);
   const pushContributionRow = push.getByTestId('muscle-contribution-row').first();
   await expect(pushContributionRow).toContainText('Barbell Bench Press');
   await expect(pushContributionRow).toContainText('chest');
   await expect(pushContributionRow.locator('td').nth(1)).toHaveText('3');
 
+  await openMuscleContributionTable(legs);
   const legsContributionRow = legs.getByTestId('muscle-contribution-row').first();
   await expect(legsContributionRow).toContainText('Barbell Squat');
   await expect(legsContributionRow).toContainText('quadriceps');
@@ -104,14 +108,92 @@ test('muscle group volume table flags untouched muscle groups for goals with a v
   await addExercise(session, 'Barbell Bench Press - Medium Grip');
   await setExerciseValues(exerciseRows(session).first(), { sets: '12' });
 
+  await openMuscleGroupVolumeTable(page);
   const table = page.getByTestId('muscle-group-volume-table');
   await expect(table).toBeVisible();
 
+  // Only the status cell (last td) carries the pass/fail color, not the whole
+  // row — the muscle name and numeric cells stay in normal text color.
   const chestRow = table.getByRole('row', { name: /chest/i });
-  await expect(chestRow).toHaveClass(/rule-pass/);
+  await expect(chestRow).not.toHaveClass(/text-success/);
+  await expect(chestRow.locator('td').last()).toHaveClass(/text-success/);
 
   const untouchedRow = table.getByTestId('muscle-group-volume-row').filter({ hasNotText: /chest/i }).first();
-  await expect(untouchedRow).toHaveClass(/rule-fail/);
+  await expect(untouchedRow).not.toHaveClass(/text-error/);
+  await expect(untouchedRow.locator('td').last()).toHaveClass(/text-error/);
+});
+
+test('muscle group volume table is keyboard-reachable and scrollable on narrow viewports', async ({ page }) => {
+  // On mobile widths the table (styled by a global CSS rule making it scroll
+  // horizontally in place, see theme.css) overflows its container. It must be
+  // reachable via Tab and scrollable via the keyboard alone (WCAG 2.1.1).
+  await page.setViewportSize({ width: 375, height: 800 });
+  await gotoApp(page);
+
+  await page.getByTestId('goal-select').selectOption('hypertrophy');
+  await addSession(page);
+  const session = sessionArticles(page).nth(0);
+  await addExercise(session, 'Barbell Bench Press - Medium Grip');
+  await setExerciseValues(exerciseRows(session).first(), { sets: '12' });
+
+  await openMuscleGroupVolumeTable(page);
+  const table = page.getByTestId('muscle-group-volume-table');
+  await expect(table).toBeVisible();
+  await expect(table).toHaveAttribute('tabindex', '0');
+  await expect(table).toHaveAccessibleName(/.+/);
+
+  await page.getByTestId('muscle-group-volume-table-summary').focus();
+  await page.keyboard.press('Tab');
+  await expect(table).toBeFocused();
+
+  const scrollLeftBefore = await table.evaluate((el) => el.scrollLeft);
+  // Nudge right with the keyboard well past what's needed to reach the end
+  // (each ArrowRight press scrolls a small, UA-dependent amount).
+  for (let i = 0; i < 40; i += 1) {
+    await page.keyboard.press('ArrowRight');
+  }
+  const scrollLeftAfter = await table.evaluate((el) => el.scrollLeft);
+  expect(scrollLeftAfter).toBeGreaterThan(scrollLeftBefore);
+
+  // The last header ("Status") must end up fully inside the table's own
+  // visible box once scrolled all the way, not clipped off past the edge.
+  const statusHeader = table.locator('thead th').last();
+  const tableBox = (await table.boundingBox())!;
+  const statusBox = (await statusHeader.boundingBox())!;
+  expect(statusBox.x).toBeGreaterThanOrEqual(tableBox.x - 1);
+  expect(statusBox.x + statusBox.width).toBeLessThanOrEqual(tableBox.x + tableBox.width + 1);
+});
+
+test('muscle group volume radar chart only renders for the hypertrophy goal', async ({ page }) => {
+  await gotoApp(page);
+
+  await page.getByTestId('goal-select').selectOption('strength');
+  await addSession(page);
+  const strengthSession = sessionArticles(page).nth(0);
+  await addExercise(strengthSession, 'Barbell Bench Press - Medium Grip');
+  await setExerciseValues(exerciseRows(strengthSession).first(), { sets: '3' });
+
+  // Strength has no muscle-group volume rule at all, so neither the table nor the chart render.
+  await expect(page.getByTestId('muscle-group-volume-empty-message')).toBeVisible();
+  await expect(page.getByTestId('muscle-group-volume-chart-wrapper')).toHaveCount(0);
+
+  await page.getByTestId('goal-select').selectOption('hypertrophy');
+
+  const chartWrapper = page.getByTestId('muscle-group-volume-chart-wrapper');
+  await expect(chartWrapper).toBeVisible();
+  const chartCanvas = chartWrapper.locator('canvas[data-testid="muscle-group-volume-chart"]');
+  await expect(chartCanvas).toBeVisible();
+
+  // The chart is capped to roughly half of the container's previous unbounded
+  // width so it no longer dwarfs the rest of the page on desktop.
+  const canvasBox = await chartCanvas.boundingBox();
+  expect(canvasBox?.width).toBeLessThanOrEqual(576);
+
+  await openMuscleGroupVolumeTable(page);
+  await expect(page.getByTestId('muscle-group-volume-table')).toBeVisible();
+
+  await page.getByTestId('goal-select').selectOption('power');
+  await expect(page.getByTestId('muscle-group-volume-chart-wrapper')).toHaveCount(0);
 });
 
 test('estimated time updates for exercise, session, and program when margin changes', async ({ page }) => {

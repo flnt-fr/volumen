@@ -1,6 +1,46 @@
 ---
-import ProgramBuilder from '../components/ProgramBuilder';
 import '../styles/theme.css';
+import NavBar from '../components/site/NavBar.astro';
+import SiteFooter from '../components/site/SiteFooter.astro';
+import LocaleFOUCScript from '../components/site/LocaleFOUCScript.astro';
+
+const readout = [
+	{ muscleKey: 'home.preview.muscle.chest', muscle: 'Chest', sets: 14, target: 16, pct: 88, ok: false },
+	{ muscleKey: 'home.preview.muscle.back', muscle: 'Back', sets: 18, target: 16, pct: 100, ok: true },
+	{ muscleKey: 'home.preview.muscle.quads', muscle: 'Quads', sets: 10, target: 16, pct: 63, ok: false },
+	{ muscleKey: 'home.preview.muscle.shoulders', muscle: 'Shoulders', sets: 16, target: 16, pct: 100, ok: true },
+] as const;
+
+const steps = [
+	{
+		n: '01',
+		titleKey: 'home.step1.title',
+		title: 'Set your goal',
+		bodyKey: 'home.step1.body',
+		body: 'Strength, hypertrophy, power, or general health — Volumen loads the ACSM 2026 volume and frequency targets that go with it.',
+	},
+	{
+		n: '02',
+		titleKey: 'home.step2.title',
+		title: 'Build your sessions',
+		bodyKey: 'home.step2.body',
+		body: 'Pick exercises from a database of 800+ movements and assign sets, reps, and rest per session.',
+	},
+	{
+		n: '03',
+		titleKey: 'home.step3.title',
+		title: 'Check the compliance',
+		bodyKey: 'home.step3.body',
+		body: 'Sets per muscle group are tallied live and checked against the recommended range, with an estimated session duration alongside.',
+	},
+	{
+		n: '04',
+		titleKey: 'home.step4.title',
+		title: 'Export & import',
+		bodyKey: 'home.step4.body',
+		body: 'Everything stays in your browser’s localStorage. Save your program as a JSON file, or load one back in, whenever you want.',
+	},
+];
 ---
 
 <html lang="en">
@@ -10,23 +50,108 @@ import '../styles/theme.css';
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<link rel="stylesheet" href="
-          https://cdn.jsdelivr.net/npm/@anyblades/blades@2/css/blades.min.css
-        "/>
-		<link rel="stylesheet" href="
-          https://cdn.jsdelivr.net/npm/@anyblades/blades@2/css/responsive-table.min.css
-        "/>
 
-		<title>Volumen — program builder</title>
-		<meta name="description" content="Build a strength-training program aligned with the 2026 ACSM resistance-training recommendations, entirely in your browser." />
+		<title>Volumen — a strength program checked against the ACSM volume targets</title>
+		<meta
+			name="description"
+			content="Build a strength-training program and see, per muscle group, whether your weekly volume matches the 2026 ACSM resistance-training recommendations. Free, private, runs entirely in your browser."
+		/>
 	</head>
-	<body>
-		<noscript>
-			<header class="container">
-				<h1>Volumen</h1>
-				<p>Build a strength training program aligned with the 2026 ACSM recommendations.</p>
-			</header>
-		</noscript>
-		<ProgramBuilder client:load />
+	<body class="min-h-screen bg-base-200 text-base-content">
+		<NavBar
+			links={[
+				{ href: '/about', key: 'footer.about' },
+				{ href: '/legal', key: 'footer.legal' },
+			]}
+			cta={{ href: '/app', key: 'nav.openApp' }}
+		/>
+
+		<main>
+			<section class="container mx-auto px-4 py-16 sm:py-24">
+				<div class="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16">
+					<div>
+						<p class="mb-4 font-mono text-sm font-semibold tracking-widest text-primary uppercase" data-i18n-key="home.eyebrow">
+							ACSM 2026-aligned programming
+						</p>
+						<h1 class="text-4xl font-black tracking-tight text-balance sm:text-5xl lg:text-6xl" data-i18n-key="home.title">
+							Build a program your volume actually supports.
+						</h1>
+						<p class="mt-6 max-w-xl text-lg text-base-content/70" data-i18n-key="home.subtitle">
+							Volumen is a free strength-training program builder that checks your weekly sets per
+							muscle group against the ACSM's 2026 resistance-training recommendations &mdash;
+							so you know if a session is under-dosed, on target, or overreaching before you
+							ever step in the gym.
+						</p>
+						<div class="mt-8 flex flex-wrap gap-3">
+							<a href="/app" class="btn btn-primary btn-lg" data-i18n-key="home.cta.primary">Create my program</a>
+							<a href="/about" class="btn btn-ghost btn-lg" data-i18n-key="home.cta.secondary">Learn more</a>
+						</div>
+						<p class="mt-6 text-sm text-base-content/65" data-i18n-key="home.privacyNote">
+							No account, no backend, no tracking &mdash; everything stays in your browser.
+						</p>
+					</div>
+
+					<div class="card bg-base-100 shadow-md" aria-hidden="true">
+						<div class="card-body gap-4">
+							<p class="font-mono text-xs font-semibold tracking-widest text-base-content/65 uppercase" data-i18n-key="home.preview.heading">
+								Weekly volume &middot; sets per muscle group
+							</p>
+							<ul class="flex flex-col gap-3">
+								{readout.map((row) => (
+									<li>
+										<div class="mb-1 flex items-baseline justify-between gap-2">
+											<span class="text-sm font-medium" data-i18n-key={row.muscleKey}>{row.muscle}</span>
+											<span class={`font-mono text-sm ${row.ok ? 'text-success' : 'text-error'}`}>
+												{row.ok ? '✓' : '✗'} {row.sets}/{row.target}{' '}
+												<span data-i18n-key="home.preview.setsUnit">sets</span>
+											</span>
+										</div>
+										<progress
+											class={`progress w-full ${row.ok ? 'progress-success' : 'progress-error'}`}
+											value={row.pct}
+											max="100"
+										></progress>
+									</li>
+								))}
+							</ul>
+							<p class="text-xs text-base-content/65" data-i18n-key="home.preview.note">Illustrative example &mdash; not a live program.</p>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="bg-base-100 py-16 sm:py-24">
+				<div class="container mx-auto px-4">
+					<h2 class="text-center text-3xl font-black tracking-tight sm:text-4xl" data-i18n-key="home.howItWorks.heading">How it works</h2>
+					<p class="mx-auto mt-3 max-w-2xl text-center text-base-content/70" data-i18n-key="home.howItWorks.subtitle">
+						Four steps, in the order you'll actually use them.
+					</p>
+					<div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+						{steps.map((step) => (
+							<article class="card bg-base-200 shadow-sm">
+								<div class="card-body">
+									<span class="font-mono text-sm font-semibold text-primary">{step.n}</span>
+									<h3 class="card-title text-lg" data-i18n-key={step.titleKey}>{step.title}</h3>
+									<p class="text-sm text-base-content/70" data-i18n-key={step.bodyKey}>{step.body}</p>
+								</div>
+							</article>
+						))}
+					</div>
+				</div>
+			</section>
+
+			<section class="container mx-auto px-4 py-16 text-center sm:py-24">
+				<h2 class="text-3xl font-black tracking-tight sm:text-4xl" data-i18n-key="home.finalCta.heading">Ready to check your program?</h2>
+				<p class="mx-auto mt-3 max-w-xl text-base-content/70" data-i18n-key="home.finalCta.subtitle">
+					It takes less time to build a session than to finish your warm-up set.
+				</p>
+				<div class="mt-8">
+					<a href="/app" class="btn btn-primary btn-lg" data-i18n-key="home.cta.primary">Create my program</a>
+				</div>
+			</section>
+		</main>
+
+		<SiteFooter />
+		<LocaleFOUCScript />
 	</body>
 </html>

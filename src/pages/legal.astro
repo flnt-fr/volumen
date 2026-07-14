@@ -1,5 +1,8 @@
 ---
 import '../styles/theme.css';
+import NavBar from '../components/site/NavBar.astro';
+import SiteFooter from '../components/site/SiteFooter.astro';
+import LocaleFOUCScript from '../components/site/LocaleFOUCScript.astro';
 ---
 
 <html lang="en">
@@ -9,54 +12,53 @@ import '../styles/theme.css';
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<link rel="stylesheet" href="
-          https://cdn.jsdelivr.net/npm/@anyblades/blades@2/css/blades.min.css
-        "/>
 
 		<title>Volumen — Legal notice</title>
 		<meta name="description" content="Legal notice for volumen.flnt.fr" />
 	</head>
-	<body>
-		<header class="container">
-			<h1>Volumen</h1>
-			<p><a href="/">← Back to the app</a> · <a href="/about">About</a></p>
-		</header>
+	<body class="min-h-screen bg-base-200 text-base-content">
+		<NavBar
+			links={[
+				{ href: '/about', key: 'footer.about' },
+			]}
+			cta={{ href: '/app', key: 'nav.openApp' }}
+		/>
 
-		<main class="container">
-			<article>
-				<h2>Legal notice</h2>
-				<p>
+		<main class="container mx-auto max-w-3xl px-4 py-8">
+			<article class="prose prose-neutral dark:prose-invert max-w-none">
+				<h1 data-i18n-key="legal.heading">Legal notice</h1>
+				<p data-i18n-key="legal.intro">
 					This page is provided as the legal notice ("mentions légales") required under French law
 					(LCEN, art. 6-III) for a website published from France.
 				</p>
 
-				<h3>Publisher</h3>
-				<p>
+				<h2 data-i18n-key="legal.publisher.heading">Publisher</h2>
+				<p data-i18n-key="legal.publisher.body">
 					This site is published on a non-professional, personal basis by Florent A.<br />
 					Contact: <a href="mailto:volumen@flnt.fr">volumen@flnt.fr</a>
 				</p>
-				<p>
+				<p data-i18n-key="legal.publisher.director">
 					Publication director: Florent A.
 				</p>
 
-				<h3>Hosting provider</h3>
-				<p>
+				<h2 data-i18n-key="legal.hosting.heading">Hosting provider</h2>
+				<p data-i18n-key="legal.hosting.body">
 					This site is hosted on a virtual private server operated by:<br />
 					OVH SAS — capital of €50,000,000<br />
 					2 rue Kellermann, 59100 Roubaix, France<br />
 					RCS Lille Métropole 424 761 419 00045
 				</p>
 
-				<h3>Intellectual property</h3>
-				<p>
+				<h2 data-i18n-key="legal.ip.heading">Intellectual property</h2>
+				<p data-i18n-key="legal.ip.body">
 					The application code is released under the MIT license. It bundles third-party data
 					under their own, separate terms (an open exercise database released into the public
 					domain, and a condensed summary of a copyrighted scientific publication). Full details,
 					credits, and license text are available in the project's <a href="https://github.com/flnt-fr/volumen">source repository</a> and its <code>README.md</code>/<code>LICENSE</code> files.
 				</p>
 
-				<h3>Personal data</h3>
-				<p>
+				<h2 data-i18n-key="legal.personalData.heading">Personal data</h2>
+				<p data-i18n-key="legal.personalData.body">
 					Volumen runs entirely in your browser. It has no backend, no user accounts, no
 					analytics, and sets no cookies. The training program you build is stored only in your
 					browser's <code>localStorage</code> and is never transmitted to, or seen by, the
@@ -66,8 +68,8 @@ import '../styles/theme.css';
 					correct, or delete on our end.
 				</p>
 
-				<h3>Liability</h3>
-				<p>
+				<h2 data-i18n-key="legal.liability.heading">Liability</h2>
+				<p data-i18n-key="legal.liability.body">
 					Volumen is an experimental, hobby project (see the <a href="/about">About</a> page for
 					context) provided "as is", without warranty of any kind, and is not medical or
 					professional fitness advice. Consult a qualified professional before starting any
@@ -75,5 +77,7 @@ import '../styles/theme.css';
 				</p>
 			</article>
 		</main>
+		<SiteFooter />
+		<LocaleFOUCScript />
 	</body>
 </html>

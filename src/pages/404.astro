@@ -1,5 +1,8 @@
 ---
 import '../styles/theme.css';
+import NavBar from '../components/site/NavBar.astro';
+import SiteFooter from '../components/site/SiteFooter.astro';
+import LocaleFOUCScript from '../components/site/LocaleFOUCScript.astro';
 ---
 
 <html lang="en">
@@ -9,25 +12,31 @@ import '../styles/theme.css';
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<link rel="stylesheet" href="
-          https://cdn.jsdelivr.net/npm/@anyblades/blades@2/css/blades.min.css
-        "/>
 
 		<title>Volumen — Page not found</title>
 		<meta name="description" content="This page doesn't exist." />
 	</head>
-	<body>
-		<header class="container">
-			<h1>Volumen</h1>
-			<p><a href="/">← Back to the app</a> · <a href="/about">About</a> · <a href="/legal">Legal notice</a></p>
-		</header>
+	<body class="min-h-screen bg-base-200 text-base-content">
+		<NavBar
+			links={[
+				{ href: '/app', key: 'nav.backToApp' },
+				{ href: '/about', key: 'footer.about' },
+				{ href: '/legal', key: 'footer.legal' },
+			]}
+		/>
 
-		<main class="container">
-			<article>
-				<h2>404 — Page not found</h2>
-				<p>There's no exercise, session, or page under that name. Head back to the program builder.</p>
-				<p><a href="/">Go to the home page</a></p>
+		<main class="container mx-auto flex max-w-3xl flex-col items-start gap-4 px-4 py-16">
+			<article class="card w-full bg-base-100 shadow-sm">
+				<div class="card-body">
+					<h1 class="card-title" data-i18n-key="notFound.title">404 — Page not found</h1>
+					<p data-i18n-key="notFound.message">There's no exercise, session, or page under that name. Head back to the program builder.</p>
+					<div class="card-actions">
+						<a href="/" class="btn btn-primary" data-i18n-key="notFound.homeLink">Go to the home page</a>
+					</div>
+				</div>
 			</article>
 		</main>
+		<SiteFooter />
+		<LocaleFOUCScript />
 	</body>
 </html>

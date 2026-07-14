@@ -1,0 +1,75 @@
+---
+import { LOCALE_STORAGE_KEY } from '../../i18n/localeStore';
+import { LOCALES, DEFAULT_LOCALE } from '../../i18n/types';
+import fr from '../../i18n/strings.fr';
+
+/**
+ * Fixes the flash-of-English-then-French bug: a returning visitor who has
+ * already chosen French sees the page render in English for ~1s before
+ * LocaleSelect.tsx's post-hydration useEffect corrects it, because that
+ * effect can't run until its Preact island's JS has been fetched, parsed,
+ * and hydrated.
+ *
+ * This component renders a small, non-module, blocking <script> — placed at
+ * the very end of <body>, after all `data-i18n-key` markup — that resolves
+ * and applies the initial locale synchronously as the parser reaches it,
+ * before hydration. Because it's a classic (not `type="module"`) inline
+ * script, it runs immediately in document order instead of being deferred.
+ *
+ * Only the French dictionary is embedded (via `define:vars`, which
+ * JSON-serializes at build time): the English strings never need to travel
+ * to the client because English is already what each static page renders
+ * server-side. If the resolved locale is English, this script is a no-op
+ * past `<html lang>`. Switching the locale afterwards (via LocaleSelect's
+ * <select>) goes through the normal `applyStaticLocale()` path, which
+ * imports the full en+fr dictionaries as an ordinary module, so a manual
+ * fr -> en toggle still works even though this script never carried the
+ * English side.
+ */
+---
+
+<script is:inline define:vars={{ frStrings: fr, storageKey: LOCALE_STORAGE_KEY, locales: LOCALES, defaultLocale: DEFAULT_LOCALE }}>
+  // Deliberately duplicated, minimal reimplementation of
+  // src/i18n/localeStore.ts's matchSupportedLocale()/detectBrowserLocale()/
+  // resolveInitialLocale() precedence (stored -> browser language ->
+  // default). Can't import that module here: ES module scripts are deferred
+  // by the browser, which would reintroduce the exact flash this script
+  // exists to prevent. Keep this logic in sync with localeStore.ts by hand.
+  (function () {
+    function matchSupportedLocale(tag) {
+      var primary = String(tag).trim().toLowerCase().split('-')[0];
+      return locales.indexOf(primary) !== -1 ? primary : null;
+    }
+
+    function detectBrowserLocale() {
+      var candidates =
+        navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language];
+      for (var i = 0; i < candidates.length; i++) {
+        var match = candidates[i] && matchSupportedLocale(candidates[i]);
+        if (match) return match;
+      }
+      return null;
+    }
+
+    var stored = null;
+    try {
+      var raw = window.localStorage.getItem(storageKey);
+      if (locales.indexOf(raw) !== -1) stored = raw;
+    } catch (e) {
+      // localStorage unavailable (private mode, disabled, etc.) — fall through.
+    }
+
+    var locale = stored || detectBrowserLocale() || defaultLocale;
+    document.documentElement.lang = locale;
+
+    if (locale === defaultLocale) return; // English already server-rendered.
+
+    var elements = document.querySelectorAll('[data-i18n-key]');
+    for (var i = 0; i < elements.length; i++) {
+      var key = elements[i].getAttribute('data-i18n-key');
+      if (key && Object.prototype.hasOwnProperty.call(frStrings, key)) {
+        elements[i].innerHTML = frStrings[key];
+      }
+    }
+  })();
+</script>

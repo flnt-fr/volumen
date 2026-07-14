@@ -1,7 +1,7 @@
 import type { Locator, Page } from '@playwright/test';
 
 /**
- * The React island hydrates asynchronously (`client:load`). The first effect
+ * The Preact island hydrates asynchronously (`client:load`). The first effect
  * in ProgramBuilder reads localStorage and immediately writes it back, so the
  * presence of the storage key is a reliable signal that hydration finished
  * and the app is ready to receive interactions.
@@ -11,7 +11,7 @@ export async function waitForHydration(page: Page) {
 }
 
 export async function gotoApp(page: Page) {
-  await page.goto('/');
+  await page.goto('/app');
   await waitForHydration(page);
 }
 
@@ -70,4 +70,12 @@ export function muscleVolumeTable(session: Locator): Locator {
 
 export async function openMuscleVolumeTable(session: Locator) {
   await session.getByTestId('muscle-volume-summary').click();
+}
+
+export async function openMuscleContributionTable(session: Locator) {
+  await session.getByTestId('muscle-contribution-summary').click();
+}
+
+export async function openMuscleGroupVolumeTable(page: Page) {
+  await page.getByTestId('muscle-group-volume-table-summary').click();
 }

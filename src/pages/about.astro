@@ -1,5 +1,8 @@
 ---
 import '../styles/theme.css';
+import NavBar from '../components/site/NavBar.astro';
+import SiteFooter from '../components/site/SiteFooter.astro';
+import LocaleFOUCScript from '../components/site/LocaleFOUCScript.astro';
 ---
 
 <html lang="en">
@@ -9,23 +12,22 @@ import '../styles/theme.css';
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<link rel="stylesheet" href="
-          https://cdn.jsdelivr.net/npm/@anyblades/blades@2/css/blades.min.css
-        "/>
 
 		<title>Volumen — About</title>
 		<meta name="description" content="How Volumen was built and its sources" />
 	</head>
-	<body>
-		<header class="container">
-			<h1>Volumen</h1>
-			<p><a href="/">← Back to the app</a> · <a href="/legal">Legal notice</a></p>
-		</header>
+	<body class="min-h-screen bg-base-200 text-base-content">
+		<NavBar
+			links={[
+				{ href: '/legal', key: 'footer.legal' },
+			]}
+			cta={{ href: '/app', key: 'nav.openApp' }}
+		/>
 
-		<main class="container">
-			<article>
-				<h2>About Volumen</h2>
-				<p>
+		<main class="container mx-auto max-w-3xl px-4 py-8">
+			<article class="prose prose-neutral dark:prose-invert max-w-none">
+				<h1 data-i18n-key="about.heading">About Volumen</h1>
+				<p data-i18n-key="about.intro">
 					Volumen is a small, fully client-side web app for building a strength-training program
 					aligned with the <a href="https://journals.lww.com/acsm-msse/fulltext/2026/04000/american_college_of_sports_medicine_position.21.aspx">
 						ACSM 2026 resistance-training recommendations</a
@@ -36,8 +38,8 @@ import '../styles/theme.css';
 					your browser's <code>localStorage</code> — no backend, no accounts, no tracking.
 				</p>
 
-				<h3>⚠️ This project is a vibe-coding experiment</h3>
-				<p>
+				<h2 data-i18n-key="about.vibeCoding.heading">⚠️ This project is a vibe-coding experiment</h2>
+				<p data-i18n-key="about.vibeCoding.p1">
 					This entire codebase — every line, every test, every design decision — was written by <strong>prompting Claude</strong> (via <a href="https://claude.com/claude-code">Claude Code</a>), not by hand. There was no
 					spec-driven-development framework, no ticket system, no formal design doc, no
 					scaffolding harness of any kind. Just a back-and-forth conversation: a feature request
@@ -46,35 +48,35 @@ import '../styles/theme.css';
 					a user would describe them ("the import doesn't work") rather than filed with a
 					root-cause diagnosis.
 				</p>
-				<p>
+				<p data-i18n-key="about.vibeCoding.p2">
 					The goal was to see how far pure conversational prompting could carry a real, working,
 					tested app — not to demonstrate a polished engineering process. Take the app with that
 					in mind: it's the product of an experiment in AI-driven ("vibe") coding, not a reference
 					architecture.
 				</p>
 
-				<h3>How it was actually built</h3>
+				<h2 data-i18n-key="about.howBuilt.heading">How it was actually built</h2>
 				<ol>
-					<li>
+					<li data-i18n-key="about.howBuilt.step1">
 						<strong>Bootstrap</strong> — started from the standard Astro minimal template with the
 						React integration added for interactive components.
 					</li>
-					<li>
+					<li data-i18n-key="about.howBuilt.step2">
 						<strong>Domain data first</strong> — dropped in two source datasets (see Sources
 						below) and asked Claude to model the domain: training goals, exercises, and the
 						program/session/exercise shape.
 					</li>
-					<li>
+					<li data-i18n-key="about.howBuilt.step3">
 						<strong>Core loop, iteratively prompted</strong> — goal selection → session/exercise
 						editing → per-muscle volume calculation → compliance checking against the ACSM rules →
 						export/import as JSON, each added as its own prompt/feature request.
 					</li>
-					<li>
+					<li data-i18n-key="about.howBuilt.step4">
 						<strong>i18n pass</strong> — English/French support, implemented as a small hand-rolled
 						lookup system (no i18n library) plus a hand-translated subset of exercise names, with
 						a tested English fallback for anything untranslated.
 					</li>
-					<li>
+					<li data-i18n-key="about.howBuilt.step5">
 						<strong>Session time estimation</strong> — a feature request ("show me how long each
 						session/exercise will take, plus a time margin input") was implemented, then run
 						through a multi-agent review loop in the same conversation: one agent implemented it,
@@ -82,18 +84,18 @@ import '../styles/theme.css';
 						driving a real browser via Playwright to validate the UI, and one independently
 						re-deriving the time-estimation math by hand.
 					</li>
-					<li>
+					<li data-i18n-key="about.howBuilt.step6">
 						<strong>Bug fixes from plain-English reports</strong> — e.g. "the import feature
 						doesn't work" was investigated from scratch rather than assumed; the actual defect (a
 						field silently dropped from the exported JSON schema) was found and fixed with
 						regression tests added after the fact.
 					</li>
-					<li>
+					<li data-i18n-key="about.howBuilt.step7">
 						<strong>Tuning by feel</strong> — later prompts adjusted the time-estimation model
 						itself (tempo assumption, equipment-change overhead) purely based on intuition about
 						what felt realistic, not a formal study.
 					</li>
-					<li>
+					<li data-i18n-key="about.howBuilt.step8">
 						<strong>Whole-project review pass</strong> — a dedicated review/fix/validate loop ran
 						across the entire codebase: one agent audited everything from scratch and flagged
 						concrete bugs (e.g. a silent-data-loss edge case where an unclamped numeric input could
@@ -102,30 +104,30 @@ import '../styles/theme.css';
 						journeys in a browser before signing off.
 					</li>
 				</ol>
-				<p>
+				<p data-i18n-key="about.howBuilt.testingNote">
 					Testing throughout was Vitest for the domain logic and Playwright for end-to-end flows,
 					both driven by Claude, with the human in the loop reviewing behavior rather than diffs
 					line by line.
 				</p>
 
-				<h3>Stack &amp; credits</h3>
+				<h2 data-i18n-key="about.stack.heading">Stack &amp; credits</h2>
 				<ul>
-					<li><a href="https://astro.build/">Astro</a> — static-first site framework, hosts a single React island.</li>
-					<li><a href="https://react.dev/">React</a> — the interactive program builder.</li>
-					<li><a href="https://zod.dev/">Zod</a> — schema validation for the localStorage program shape and the export/import JSON file format.</li>
-					<li><a href="https://github.com/anyblades/blades">@anyblades/blades</a> — the classless/Pico-inspired CSS framework used for base styling.</li>
-					<li><a href="https://vitest.dev/">Vitest</a> — unit tests for the domain logic.</li>
-					<li><a href="https://playwright.dev/">Playwright</a> — end-to-end browser tests.</li>
-					<li><a href="https://www.typescriptlang.org/">TypeScript</a> throughout.</li>
-					<li>
+					<li data-i18n-key="about.stack.item1"><a href="https://astro.build/">Astro</a> — static-first site framework, hosts a single Preact island.</li>
+					<li data-i18n-key="about.stack.item2"><a href="https://preactjs.com/">Preact</a> — the interactive program builder.</li>
+					<li data-i18n-key="about.stack.item3"><a href="https://zod.dev/">Zod</a> — schema validation for the localStorage program shape and the export/import JSON file format.</li>
+					<li data-i18n-key="about.stack.item4"><a href="https://tailwindcss.com/">Tailwind CSS</a> and <a href="https://daisyui.com/">daisyUI</a> — utility classes and themed components used for styling.</li>
+					<li data-i18n-key="about.stack.item5"><a href="https://vitest.dev/">Vitest</a> — unit tests for the domain logic.</li>
+					<li data-i18n-key="about.stack.item6"><a href="https://playwright.dev/">Playwright</a> — end-to-end browser tests.</li>
+					<li data-i18n-key="about.stack.item7"><a href="https://www.typescriptlang.org/">TypeScript</a> throughout.</li>
+					<li data-i18n-key="about.stack.item8">
 						<a href="https://www.anthropic.com/claude">Claude</a> (Anthropic), via <a href="https://claude.com/claude-code">Claude Code</a> — wrote the entire
 						application, tests, and documentation, from natural-language prompts.
 					</li>
 				</ul>
 
-				<h3>Sources</h3>
+				<h2 data-i18n-key="about.sources.heading">Sources</h2>
 				<ul>
-					<li>
+					<li data-i18n-key="about.sources.item1">
 						<strong>Training-goal rules</strong> — summarized from the American College of Sports
 						Medicine's 2026 position stand, <em>"Resistance Training Prescription for Muscle
 						Function, Hypertrophy, and Physical Performance in Healthy Adults: An Overview of
@@ -133,7 +135,7 @@ import '../styles/theme.css';
 							Full text</a
 						>.
 					</li>
-					<li>
+					<li data-i18n-key="about.sources.item2">
 						<strong>Exercise database</strong> — from <a href="https://github.com/yuhonas/free-exercise-db">yuhonas/free-exercise-db</a> (~870 entries), itself restructured from an original dataset by Ollie Jennings
 						(<a href="https://github.com/wrkout/exercises.json">wrkout/exercises.json</a>).
 						Exercise names have a partial hand-authored French translation layer, falling back to
@@ -141,8 +143,8 @@ import '../styles/theme.css';
 					</li>
 				</ul>
 
-				<h3>License</h3>
-				<p>
+				<h2 data-i18n-key="about.license.heading">License</h2>
+				<p data-i18n-key="about.license.body">
 					The application code is MIT-licensed. That license does not extend to the third-party
 					data bundled with the app — the exercise database is public domain (Unlicense) and
 					credited above out of courtesy, while the ACSM training-goal data is a condensed summary
@@ -151,5 +153,7 @@ import '../styles/theme.css';
 				</p>
 			</article>
 		</main>
+		<SiteFooter />
+		<LocaleFOUCScript />
 	</body>
 </html>

@@ -23,4 +23,15 @@ describe('t', () => {
   it('leaves unresolved placeholders untouched', () => {
     expect(t('en', 'sessions.defaultName')).toBe('Session {index}');
   });
+
+  it('translates static-page keys used by the marketing pages', () => {
+    expect(t('en', 'home.title')).toBe('Build a program your volume actually supports.');
+    expect(t('fr', 'home.title')).toBe('Créez un programme que votre volume supporte vraiment.');
+    expect(t('en', 'about.heading')).toBe('About Volumen');
+    expect(t('fr', 'about.heading')).toBe('À propos de Volumen');
+    expect(t('en', 'legal.heading')).toBe('Legal notice');
+    expect(t('fr', 'legal.heading')).toBe('Mentions légales');
+    expect(t('en', 'notFound.title')).toBe('404 — Page not found');
+    expect(t('fr', 'notFound.title')).toBe('404 — Page introuvable');
+  });
 });

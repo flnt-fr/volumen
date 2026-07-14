@@ -1,4 +1,5 @@
-import { useId, useRef, useState } from 'react';
+import { useId, useRef, useState } from 'preact/hooks';
+import type { JSX } from 'preact';
 import { buildProgramFile, parseProgramFile } from '../lib/programFile';
 import type { TrainingGoal } from '../lib/data';
 import type { Program } from '../lib/types';
@@ -27,8 +28,8 @@ export default function ExportImportBar({ program, goal, onImport }: ExportImpor
     URL.revokeObjectURL(url);
   }
 
-  async function handleImport(event: React.ChangeEvent<HTMLInputElement>) {
-    const inputFile = event.target.files?.[0];
+  async function handleImport(event: JSX.TargetedEvent<HTMLInputElement>) {
+    const inputFile = event.currentTarget.files?.[0];
     if (!inputFile) return;
 
     try {
@@ -48,32 +49,46 @@ export default function ExportImportBar({ program, goal, onImport }: ExportImpor
   }
 
   return (
-    <article>
-      <h2>{t('exportImport.heading')}</h2>
-      <button type="button" data-testid="export-button" onClick={handleExport}>
-        {t('exportImport.export')}
-      </button>
+    <article className="card border border-base-300 bg-base-100">
+      <div className="card-body">
+        <h2 className="card-title text-xl font-black tracking-tight">{t('exportImport.heading')}</h2>
+        <div className="flex flex-wrap items-end gap-4">
+          <fieldset className="fieldset">
+            <span className="fieldset-label invisible" aria-hidden="true">
+              {t('exportImport.export')}
+            </span>
+            <button type="button" className="btn btn-primary" data-testid="export-button" onClick={handleExport}>
+              {t('exportImport.export')}
+            </button>
+          </fieldset>
 
-      <label htmlFor={importId}>{t('exportImport.importLabel')}</label>
-      <input
-        id={importId}
-        data-testid="import-input"
-        ref={fileInputRef}
-        type="file"
-        accept="application/json"
-        onChange={handleImport}
-      />
-
-      {errors.length > 0 && (
-        <div role="alert" data-testid="import-error" className="import-errors">
-          <p>{t('exportImport.invalidFile')}</p>
-          <ul>
-            {errors.map((error) => (
-              <li key={error}>{error}</li>
-            ))}
-          </ul>
+          <fieldset className="fieldset">
+            <label className="fieldset-label" htmlFor={importId}>
+              {t('exportImport.importLabel')}
+            </label>
+            <input
+              id={importId}
+              data-testid="import-input"
+              ref={fileInputRef}
+              type="file"
+              accept="application/json"
+              className="file-input file-input-bordered"
+              onChange={handleImport}
+            />
+          </fieldset>
         </div>
-      )}
+
+        {errors.length > 0 && (
+          <div role="alert" data-testid="import-error" className="alert alert-error alert-outline flex-col items-start">
+            <p>{t('exportImport.invalidFile')}</p>
+            <ul className="list-disc pl-5">
+              {errors.map((error) => (
+                <li key={error}>{error}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
     </article>
   );
 }

@@ -36,20 +36,25 @@ export default function SessionList({ sessions, marginMinutes, onChange, onMargi
   }
 
   return (
-    <section data-testid="sessions-section">
-      <h2>{t('sessions.heading')}</h2>
-      <label htmlFor="margin-minutes-input">{t('sessions.marginLabel')}</label>
-      <input
-        id="margin-minutes-input"
-        data-testid="margin-input"
-        type="number"
-        min={0}
-        value={marginMinutes}
-        onChange={(event) => {
-          const rounded = Math.round(Number(event.target.value));
-          onMarginMinutesChange(Math.max(0, Number.isNaN(rounded) ? 0 : rounded));
-        }}
-      />
+    <section className="flex flex-col gap-4" data-testid="sessions-section">
+      <h2 className="text-xl font-black tracking-tight">{t('sessions.heading')}</h2>
+      <fieldset className="fieldset w-full max-w-xs">
+        <label className="fieldset-label" htmlFor="margin-minutes-input">
+          {t('sessions.marginLabel')}
+        </label>
+        <input
+          id="margin-minutes-input"
+          data-testid="margin-input"
+          type="number"
+          min={0}
+          className="input input-bordered"
+          value={marginMinutes}
+          onInput={(event) => {
+            const rounded = Math.round(Number(event.currentTarget.value));
+            onMarginMinutesChange(Math.max(0, Number.isNaN(rounded) ? 0 : rounded));
+          }}
+        />
+      </fieldset>
       {sessions.length === 0 && <p data-testid="no-sessions-message">{t('sessions.empty')}</p>}
       {sessions.map((session) => (
         <SessionEditor
@@ -60,7 +65,7 @@ export default function SessionList({ sessions, marginMinutes, onChange, onMargi
           onRemove={() => removeSession(session.id)}
         />
       ))}
-      <button type="button" data-testid="add-session-button" onClick={addSession}>
+      <button type="button" className="btn btn-primary self-start" data-testid="add-session-button" onClick={addSession}>
         {t('sessions.add')}
       </button>
       <p data-testid="program-total-time">

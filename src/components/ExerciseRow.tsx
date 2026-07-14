@@ -27,9 +27,10 @@ export default function ExerciseRow({ exercise, onChange, onRemove }: ExerciseRo
           data-testid="exercise-sets-input"
           type="number"
           min={1}
+          className="input input-bordered input-sm"
           value={exercise.sets}
-          onChange={(event) => {
-            const rounded = Math.round(Number(event.target.value));
+          onInput={(event) => {
+            const rounded = Math.round(Number(event.currentTarget.value));
             onChange({ ...exercise, sets: Math.max(1, Number.isNaN(rounded) ? 1 : rounded) });
           }}
         />
@@ -42,8 +43,9 @@ export default function ExerciseRow({ exercise, onChange, onRemove }: ExerciseRo
           id={`reps-${exercise.id}`}
           data-testid="exercise-reps-input"
           type="text"
+          className="input input-bordered input-sm"
           value={exercise.reps}
-          onChange={(event) => onChange({ ...exercise, reps: event.target.value })}
+          onInput={(event) => onChange({ ...exercise, reps: event.currentTarget.value })}
         />
       </td>
       <td>
@@ -55,9 +57,10 @@ export default function ExerciseRow({ exercise, onChange, onRemove }: ExerciseRo
           data-testid="exercise-rest-input"
           type="number"
           min={0}
+          className="input input-bordered input-sm"
           value={exercise.restSeconds}
-          onChange={(event) => {
-            const rounded = Math.round(Number(event.target.value));
+          onInput={(event) => {
+            const rounded = Math.round(Number(event.currentTarget.value));
             onChange({ ...exercise, restSeconds: Math.max(0, Number.isNaN(rounded) ? 0 : rounded) });
           }}
         />
@@ -71,7 +74,7 @@ export default function ExerciseRow({ exercise, onChange, onRemove }: ExerciseRo
       <td>
         <button
           type="button"
-          className="outline"
+          className="btn btn-ghost btn-sm"
           data-testid="delete-exercise-button"
           aria-label={t('exerciseRow.deleteAria', { name: exerciseName })}
           onClick={onRemove}

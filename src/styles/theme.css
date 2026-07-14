@@ -1,87 +1,58 @@
-/* Volumen color identity: overrides blades' --pico-primary* variables */
-[data-theme='light'],
-:root:not([data-theme='dark']) {
-  --pico-primary: #1d6b4a;
-  --pico-primary-background: #1d6b4a;
-  --pico-primary-border: var(--pico-primary-background);
-  --pico-primary-underline: rgba(29, 107, 74, 0.5);
-  --pico-primary-hover: #154f37;
-  --pico-primary-hover-background: #175d40;
-  --pico-primary-hover-border: var(--pico-primary-hover-background);
-  --pico-primary-hover-underline: var(--pico-primary-hover);
-  --pico-primary-focus: rgba(29, 158, 107, 0.5);
-  --pico-primary-inverse: #fff;
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+@plugin 'daisyui' {
+  themes: volumenlight --default, volumendark --prefersdark;
 }
 
-@media only screen and (prefers-color-scheme: dark) {
-  :root:not([data-theme]) {
-    --pico-primary: #3ecf8e;
-    --pico-primary-background: #1d6b4a;
-    --pico-primary-border: var(--pico-primary-background);
-    --pico-primary-underline: rgba(62, 207, 142, 0.5);
-    --pico-primary-hover: #7fe0b6;
-    --pico-primary-hover-background: #248c5f;
-    --pico-primary-hover-border: var(--pico-primary-hover-background);
-    --pico-primary-hover-underline: var(--pico-primary-hover);
-    --pico-primary-focus: rgba(62, 207, 142, 0.375);
-    --pico-primary-inverse: #fff;
-  }
+/* Volumen color identity: a deep forest green in light mode, a brighter
+   mint/emerald in dark mode (kept from the previous blades --pico-primary*
+   values) rather than daisyUI's generic default palette. */
+@plugin 'daisyui/theme' {
+  name: 'volumenlight';
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: #ffffff;
+  --color-base-200: #f2f5f3;
+  --color-base-300: #e4e9e6;
+  --color-base-content: #16241d;
+  --color-neutral: #16241d;
+  --color-neutral-content: #ffffff;
+  --color-primary: #1d6b4a;
+  --color-primary-content: #ffffff;
+  --color-secondary: #175d40;
+  --color-secondary-content: #ffffff;
+  --color-accent: #248c5f;
+  --color-accent-content: #ffffff;
+  --color-success: #1d6b4a;
+  --color-success-content: #ffffff;
+  --color-error: #b3261e;
+  --color-error-content: #ffffff;
 }
 
-[data-theme='dark'] {
-  --pico-primary: #3ecf8e;
-  --pico-primary-background: #1d6b4a;
-  --pico-primary-border: var(--pico-primary-background);
-  --pico-primary-underline: rgba(62, 207, 142, 0.5);
-  --pico-primary-hover: #7fe0b6;
-  --pico-primary-hover-background: #248c5f;
-  --pico-primary-hover-border: var(--pico-primary-hover-background);
-  --pico-primary-hover-underline: var(--pico-primary-hover);
-  --pico-primary-focus: rgba(62, 207, 142, 0.375);
-  --pico-primary-inverse: #fff;
-}
+@plugin 'daisyui/theme' {
+  name: 'volumendark';
+  default: false;
+  prefersdark: true;
+  color-scheme: dark;
 
-.rule-pass {
-  color: #1d6b4a;
-}
-
-.rule-fail {
-  color: #b3261e;
-}
-
-@media only screen and (prefers-color-scheme: dark) {
-  :root:not([data-theme]) .rule-pass {
-    color: var(--pico-primary-hover);
-  }
-
-  :root:not([data-theme]) .rule-fail {
-    color: #ff8a80;
-  }
-
-  :root:not([data-theme]) .import-errors {
-    color: #ff8a80;
-    border-color: #ff8a80;
-  }
-}
-
-[data-theme='dark'] .rule-pass {
-  color: var(--pico-primary-hover);
-}
-
-[data-theme='dark'] .rule-fail {
-  color: #ff8a80;
-}
-
-[data-theme='dark'] .import-errors {
-  color: #ff8a80;
-  border-color: #ff8a80;
-}
-
-.import-errors {
-  color: #b3261e;
-  border: 1px solid #b3261e;
-  border-radius: 0.25rem;
-  padding: 0.75rem 1rem;
+  --color-base-100: #182922;
+  --color-base-200: #101c17;
+  --color-base-300: #0b1410;
+  --color-base-content: #eaf2ee;
+  --color-neutral: #0b1410;
+  --color-neutral-content: #eaf2ee;
+  --color-primary: #3ecf8e;
+  --color-primary-content: #08281a;
+  --color-secondary: #7fe0b6;
+  --color-secondary-content: #08281a;
+  --color-accent: #248c5f;
+  --color-accent-content: #ffffff;
+  --color-success: #3ecf8e;
+  --color-success-content: #08281a;
+  --color-error: #ff8a80;
+  --color-error-content: #3a0a06;
 }
 
 [data-testid='exercise-table'] input[type='number'],
@@ -90,17 +61,21 @@
   min-width: 4rem;
 }
 
-/* Plain horizontal scroll on overflow, without blades' `.responsive`
-   full-bleed centering trick (margin-left: 50%; transform: translateX(-50%)),
-   which assumes the table breaks out of a narrow content column. Here the
-   table already sits inside a normally-padded card, so that trick just
-   leaves a stray gap on its left.
+/* daisyUI's default `.fieldset-label` color sits at ~60% opacity of
+   base-content, which measures ~4.2-4.3:1 against base-100/base-200 in the
+   light theme (confirmed via axe-core's color-contrast rule) — under the
+   4.5:1 WCAG AA threshold for normal-size text. Bump it to a slightly darker
+   value that comfortably clears 4.5:1 in both themes without a visible
+   change in intent (still a muted/secondary label color). */
+.fieldset-label {
+  color: color-mix(in srgb, var(--color-base-content) 65%, transparent);
+}
 
-   `overflow-x: auto` alone does not reliably contain a <table>'s scrollable
-   overflow: a table's internal auto-layout sizing can still leak its full
-   (unclipped) intrinsic width into the document's scrollable area, causing
-   page-wide horizontal scroll even though the table itself visually clips
-   and scrolls correctly (confirmed via document.documentElement.scrollWidth
+/* Plain horizontal scroll on overflow, without relying on a table's own
+   auto-layout sizing: a table's internal auto-layout sizing can leak its
+   full (unclipped) intrinsic width into the document's scrollable area,
+   causing page-wide horizontal scroll even though the table itself visually
+   clips and scrolls correctly (confirmed via document.documentElement.scrollWidth
    growing past clientWidth at 375px). `contain: paint` forces the table to
    establish a real clipping/containing boundary so the overflow stays local
    to the table's own scroll container. */
@@ -114,58 +89,32 @@
   contain: paint;
 }
 
-/* blades' `body>header,body>main,body>footer{padding-block:...}` rule only
-   matches when these are DIRECT children of <body>. On the home page they're
-   rendered by React inside <astro-island>, so the real DOM is
-   `body > astro-island > header`/`main` and the rule never matches, leaving
-   zero top padding. Re-assert the same padding regardless of nesting depth;
-   on the static pages (/about, /legal, /404) this just restates the value
-   blades' own rule already applies, so it doesn't double up. */
-header.container,
-main.container,
-footer.container {
-  padding-block: var(--pico-block-spacing-vertical);
-}
-
-/* blades' disabled-button styling is opacity-based dimming, which on the
-   exercise-picker "Add" button leaves near-white text on a washed-out sage
-   background — hard to read in light theme. Use an explicit muted
-   background/text pair instead of relying on opacity, for both themes. */
-[data-testid='exercise-picker-add-button']:disabled {
-  opacity: 1;
-  background-color: #b7bcc4;
-  border-color: #b7bcc4;
-  color: #2b2f36;
-}
-
-@media only screen and (prefers-color-scheme: dark) {
-  :root:not([data-theme]) [data-testid='exercise-picker-add-button']:disabled {
-    background-color: #5a6270;
-    border-color: #5a6270;
-    color: #e4e6eb;
-  }
-}
-
-[data-theme='dark'] [data-testid='exercise-picker-add-button']:disabled {
-  background-color: #5a6270;
-  border-color: #5a6270;
-  color: #e4e6eb;
-}
-
-/* blades sets th to vertical-align: bottom while td is top, misaligning
-   row headers (exercise/muscle name) against their sibling cells */
+/* th is vertical-align: baseline by default while td is top-aligned in some
+   browsers' table UA styles, misaligning row headers (exercise/muscle name)
+   against their sibling cells */
 table th[scope='row'] {
   vertical-align: top;
 }
 
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+/* daisyUI's `.input-bordered`/`.select-bordered`/`.file-input-bordered`
+   border color sits very close to the surrounding card background
+   (`--color-base-300` vs `--color-base-100`) in this custom theme, making it
+   hard to tell editable fields apart from static text/headings at a glance.
+   Strengthen the border and add a faint background tint so inputs read
+   clearly as editable in both themes, using only existing theme tokens (no
+   hardcoded hex colors). */
+.input-bordered,
+.select-bordered,
+.file-input-bordered,
+.textarea-bordered {
+  border-width: 2px;
+  border-color: color-mix(in srgb, var(--color-base-content) 35%, transparent);
+  background-color: color-mix(in srgb, var(--color-base-content) 4%, var(--color-base-100));
+}
+
+.input-bordered:focus,
+.select-bordered:focus,
+.file-input-bordered:focus,
+.textarea-bordered:focus {
+  border-color: var(--color-primary);
 }

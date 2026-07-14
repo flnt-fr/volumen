@@ -4,9 +4,17 @@ export default function AppFooter() {
   const { t } = useTranslation();
 
   return (
-    <footer className="container">
+    <footer className="footer footer-center bg-base-100 px-4 py-6 text-base-content/70 sm:px-6">
       <p>
-        <a href="/about">{t('footer.about')}</a> · <a href="/legal">{t('footer.legal')}</a>
+        <span>
+          <a href="/about" className="link link-hover">
+            {t('footer.about')}
+          </a>{' '}
+          ·{' '}
+          <a href="/legal" className="link link-hover">
+            {t('footer.legal')}
+          </a>
+        </span>
       </p>
     </footer>
   );

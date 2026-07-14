@@ -12,32 +12,37 @@ export default function GoalSelector({ goalId, onChange }: GoalSelectorProps) {
   const goal = getGoalById(goalId);
 
   return (
-    <article>
-      <h2>{t('goalSelector.heading')}</h2>
-      <label htmlFor="goal-select">{t('goalSelector.label')}</label>
-      <select
-        id="goal-select"
-        data-testid="goal-select"
-        value={goalId}
-        onChange={(event) => onChange(event.target.value)}
-      >
-        {trainingGoals.map((trainingGoal) => (
-          <option key={trainingGoal.id} value={trainingGoal.id}>
-            {getGoalName(trainingGoal, locale)}
-          </option>
-        ))}
-      </select>
+    <article className="card border border-base-300 bg-base-100">
+      <div className="card-body">
+        <h2 className="card-title text-xl font-black tracking-tight">{t('goalSelector.heading')}</h2>
+        <label className="fieldset-label" htmlFor="goal-select">
+          {t('goalSelector.label')}
+        </label>
+        <select
+          id="goal-select"
+          data-testid="goal-select"
+          className="select select-bordered w-full max-w-xs"
+          value={goalId}
+          onChange={(event) => onChange(event.currentTarget.value)}
+        >
+          {trainingGoals.map((trainingGoal) => (
+            <option key={trainingGoal.id} value={trainingGoal.id}>
+              {getGoalName(trainingGoal, locale)}
+            </option>
+          ))}
+        </select>
 
-      {goal && (
-        <div>
-          <p>{getGoalDefinition(goal, locale)}</p>
-          <ul>
-            {getGoalKeyPrinciples(goal, locale).map((principle) => (
-              <li key={principle}>{principle}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+        {goal && (
+          <div>
+            <p>{getGoalDefinition(goal, locale)}</p>
+            <ul className="list-disc pl-5">
+              {getGoalKeyPrinciples(goal, locale).map((principle) => (
+                <li key={principle}>{principle}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
     </article>
   );
 }
