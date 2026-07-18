@@ -1,5 +1,6 @@
 import SessionEditor from './SessionEditor';
 import { formatDuration, programEstimatedSeconds } from '../lib/calculations';
+import { clampRoundedInput } from '../lib/numberInput';
 import type { Program, Session } from '../lib/types';
 import { useTranslation } from '../i18n/context';
 
@@ -49,10 +50,7 @@ export default function SessionList({ sessions, marginMinutes, onChange, onMargi
           min={0}
           className="input input-bordered"
           value={marginMinutes}
-          onInput={(event) => {
-            const rounded = Math.round(Number(event.currentTarget.value));
-            onMarginMinutesChange(Math.max(0, Number.isNaN(rounded) ? 0 : rounded));
-          }}
+          onInput={(event) => onMarginMinutesChange(clampRoundedInput(event.currentTarget.value, 0))}
         />
       </fieldset>
       {sessions.length === 0 && <p data-testid="no-sessions-message">{t('sessions.empty')}</p>}

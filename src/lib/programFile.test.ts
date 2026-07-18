@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { exercises, getGoalById } from './data';
-import { buildProgramFile, parseProgramFile, parseStoredProgram, ProgramFileSchema } from './programFile';
+import { buildProgramFile, getSchemas, parseProgramFile, parseStoredProgram } from './programFile';
 import type { Program } from './types';
 
 const exerciseA = exercises[0];
@@ -24,41 +24,42 @@ function samplePrograms(): Program {
 }
 
 describe('ProgramFileSchema round-trip', () => {
-  it('export then import yields an equivalent program', () => {
+  it('export then import yields an equivalent program', async () => {
     const program = samplePrograms();
     const goal = getGoalById(program.goalId)!;
 
-    const file = buildProgramFile(program, goal);
+    const file = await buildProgramFile(program, goal);
+    const { ProgramFileSchema } = await getSchemas();
     expect(ProgramFileSchema.safeParse(file).success).toBe(true);
 
-    const result = parseProgramFile(file);
+    const result = await parseProgramFile(file);
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.program).toEqual(program);
     }
   });
 
-  it('preserves a non-zero marginMinutes across export and re-import', () => {
+  it('preserves a non-zero marginMinutes across export and re-import', async () => {
     const program = { ...samplePrograms(), marginMinutes: 15 };
     const goal = getGoalById(program.goalId)!;
 
-    const file = buildProgramFile(program, goal);
+    const file = await buildProgramFile(program, goal);
     expect(file.marginMinutes).toBe(15);
 
-    const result = parseProgramFile(file);
+    const result = await parseProgramFile(file);
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.program.marginMinutes).toBe(15);
     }
   });
 
-  it('defaults marginMinutes to 0 when importing a file exported before the field existed', () => {
+  it('defaults marginMinutes to 0 when importing a file exported before the field existed', async () => {
     const program = samplePrograms();
     const goal = getGoalById(program.goalId)!;
-    const file = buildProgramFile(program, goal) as Record<string, unknown>;
+    const file = (await buildProgramFile(program, goal)) as Record<string, unknown>;
     delete file.marginMinutes;
 
-    const result = parseProgramFile(file);
+    const result = await parseProgramFile(file);
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.program.marginMinutes).toBe(0);
@@ -67,42 +68,42 @@ describe('ProgramFileSchema round-trip', () => {
 });
 
 describe('parseProgramFile invalid input', () => {
-  it('rejects malformed JSON structure', () => {
-    const result = parseProgramFile({ not: 'a program file' });
+  it('rejects malformed JSON structure', async () => {
+    const result = await parseProgramFile({ not: 'a program file' });
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.errors.length).toBeGreaterThan(0);
     }
   });
 
-  it('rejects an unknown exerciseId', () => {
+  it('rejects an unknown exerciseId', async () => {
     const program = samplePrograms();
     const goal = getGoalById(program.goalId)!;
-    const file = buildProgramFile(program, goal);
+    const file = await buildProgramFile(program, goal);
     file.sessions[0].exercises[0].exerciseId = 'not-a-real-exercise-id';
 
-    const result = parseProgramFile(file);
+    const result = await parseProgramFile(file);
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.errors.some((e) => e.includes('exerciseId'))).toBe(true);
     }
   });
 
-  it('rejects an unknown goalId', () => {
+  it('rejects an unknown goalId', async () => {
     const program = samplePrograms();
     const goal = getGoalById(program.goalId)!;
-    const file = buildProgramFile(program, goal);
+    const file = await buildProgramFile(program, goal);
     file.header.goal.id = 'not-a-real-goal';
 
-    const result = parseProgramFile(file);
+    const result = await parseProgramFile(file);
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.errors.some((e) => e.includes('goal.id'))).toBe(true);
     }
   });
 
-  it('reports errors in French when a French locale is requested', () => {
-    const result = parseProgramFile({ not: 'a program file' }, 'fr');
+  it('reports errors in French when a French locale is requested', async () => {
+    const result = await parseProgramFile({ not: 'a program file' }, 'fr');
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.errors.some((e) => e.includes('champ manquant'))).toBe(true);
@@ -111,7 +112,7 @@ describe('parseProgramFile invalid input', () => {
 });
 
 describe('parseStoredProgram', () => {
-  it('defaults marginMinutes to 0 for a program saved before marginMinutes existed', () => {
+  it('defaults marginMinutes to 0 for a program saved before marginMinutes existed', async () => {
     const legacyStored = {
       goalId: 'hypertrophy',
       sessions: [
@@ -123,12 +124,12 @@ describe('parseStoredProgram', () => {
       ],
     };
 
-    const program = parseStoredProgram(legacyStored);
+    const program = await parseStoredProgram(legacyStored);
     expect(program).not.toBeNull();
     expect(program?.marginMinutes).toBe(0);
   });
 
-  it('round-trips a program that already has a marginMinutes value', () => {
+  it('round-trips a program that already has a marginMinutes value', async () => {
     const stored = {
       goalId: 'hypertrophy',
       marginMinutes: 5,
@@ -141,18 +142,18 @@ describe('parseStoredProgram', () => {
       ],
     };
 
-    const program = parseStoredProgram(stored);
+    const program = await parseStoredProgram(stored);
     expect(program).not.toBeNull();
     expect(program?.marginMinutes).toBe(5);
   });
 });
 
 describe('buildProgramFile locale', () => {
-  it('snapshots the goal name and definition in the requested locale', () => {
+  it('snapshots the goal name and definition in the requested locale', async () => {
     const program = samplePrograms();
     const goal = getGoalById(program.goalId)!;
 
-    const file = buildProgramFile(program, goal, 'fr');
+    const file = await buildProgramFile(program, goal, 'fr');
     expect(file.header.goal.name).toBe('Hypertrophie (croissance musculaire)');
   });
 });

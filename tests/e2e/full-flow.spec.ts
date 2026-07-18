@@ -235,3 +235,14 @@ test('estimated time updates for exercise, session, and program when margin chan
   // Program total sums both sessions' raw seconds before rounding: (450+300)*2 = 1500s = 25 min.
   await expect(page.getByTestId('program-total-time')).toContainText('25 min');
 });
+
+test('typing an exercise name with different casing still matches and adds it', async ({ page }) => {
+  await gotoApp(page);
+  await addSession(page);
+  const session = sessionArticles(page).first();
+
+  await addExercise(session, 'barbell bench press - medium grip');
+
+  await expect(exerciseRows(session)).toHaveCount(1);
+  await expect(exerciseRows(session).first()).toContainText('Barbell Bench Press - Medium Grip');
+});

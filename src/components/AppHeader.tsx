@@ -1,10 +1,6 @@
 import { useTranslation } from '../i18n/context';
-import { LOCALES, type Locale } from '../i18n/types';
-
-const LOCALE_NAMES: Record<Locale, string> = {
-  en: 'EN',
-  fr: 'FR',
-};
+import { LOCALE_NAMES, LOCALES, type Locale } from '../i18n/types';
+import { startTour } from '../lib/tour';
 
 /**
  * Mirrors the markup/classes of the shared static-page header (NavBar.astro
@@ -20,7 +16,7 @@ export default function AppHeader() {
   const { t, locale, setLocale } = useTranslation();
 
   return (
-    <header className="navbar flex-wrap gap-x-2 gap-y-1 bg-base-100 shadow-sm px-4 py-2 sm:px-6">
+    <header className="navbar flex-wrap gap-x-2 gap-y-1 bg-base-100 shadow-sm px-4 py-2 sm:px-6" data-testid="app-header">
       <div className="flex-1">
         <h1 className="m-0 inline-flex text-inherit">
           <a href="/" className="btn btn-ghost text-xl">
@@ -30,6 +26,11 @@ export default function AppHeader() {
       </div>
       <div className="flex-none max-w-full">
         <ul className="menu menu-horizontal max-w-full flex-wrap items-center justify-end gap-1 px-1">
+          <li>
+            <button type="button" className="btn btn-ghost btn-sm" data-testid="start-tour-button" onClick={() => startTour(t)}>
+              {t('tour.startButton')}
+            </button>
+          </li>
           <li>
             <a href="/about">{t('footer.about')}</a>
           </li>

@@ -12,7 +12,7 @@ export default function GoalSelector({ goalId, onChange }: GoalSelectorProps) {
   const goal = getGoalById(goalId);
 
   return (
-    <article className="card border border-base-300 bg-base-100">
+    <article className="card border border-base-300 bg-base-100" data-testid="goal-selector-card">
       <div className="card-body">
         <h2 className="card-title text-xl font-black tracking-tight">{t('goalSelector.heading')}</h2>
         <label className="fieldset-label" htmlFor="goal-select">

@@ -10,7 +10,23 @@ export async function waitForHydration(page: Page) {
   await page.waitForFunction(() => window.localStorage.getItem('volumen:program') !== null);
 }
 
+/**
+ * Marks the guided tour (driver.js, see src/lib/tour.ts) as already seen
+ * before the page even loads, via an init script that runs before any of
+ * the page's own scripts. Every test in this suite except
+ * tests/e2e/tour.spec.ts uses this (through gotoApp/seedTourSeen) so the
+ * tour's auto-launch-on-first-visit behavior — and its full-page overlay,
+ * which would otherwise intercept clicks meant for the app underneath —
+ * doesn't interfere with unrelated flows. Each Playwright test gets a fresh
+ * browser context (no localStorage carried over), so without this every
+ * test would otherwise see a fresh "first visit".
+ */
+export async function seedTourSeen(page: Page) {
+  await page.addInitScript(() => window.localStorage.setItem('volumen:tourSeen', 'true'));
+}
+
 export async function gotoApp(page: Page) {
+  await seedTourSeen(page);
   await page.goto('/app');
   await waitForHydration(page);
 }

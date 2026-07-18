@@ -1,13 +1,8 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { t } from '../../i18n/t';
-import { LOCALES, type Locale } from '../../i18n/types';
+import { LOCALE_NAMES, LOCALES, type Locale } from '../../i18n/types';
 import { resolveInitialLocale, setStoredLocale } from '../../i18n/localeStore';
 import { applyStaticLocale } from './applyStaticLocale';
-
-const LOCALE_NAMES: Record<Locale, string> = {
-  en: 'EN',
-  fr: 'FR',
-};
 
 /**
  * The only hydrated leaf in the shared nav (see NavBar.astro): the logo,

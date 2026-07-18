@@ -1,5 +1,6 @@
 import { getExerciseById } from '../lib/data';
 import { EQUIPMENT_CHANGE_SECONDS, exerciseEstimatedSeconds, formatDuration } from '../lib/calculations';
+import { clampRoundedInput } from '../lib/numberInput';
 import type { ProgramExercise } from '../lib/types';
 import { useTranslation } from '../i18n/context';
 import { getExerciseName } from '../i18n/exerciseNames';
@@ -29,10 +30,7 @@ export default function ExerciseRow({ exercise, onChange, onRemove }: ExerciseRo
           min={1}
           className="input input-bordered input-sm"
           value={exercise.sets}
-          onInput={(event) => {
-            const rounded = Math.round(Number(event.currentTarget.value));
-            onChange({ ...exercise, sets: Math.max(1, Number.isNaN(rounded) ? 1 : rounded) });
-          }}
+          onInput={(event) => onChange({ ...exercise, sets: clampRoundedInput(event.currentTarget.value, 1) })}
         />
       </td>
       <td>
@@ -59,10 +57,7 @@ export default function ExerciseRow({ exercise, onChange, onRemove }: ExerciseRo
           min={0}
           className="input input-bordered input-sm"
           value={exercise.restSeconds}
-          onInput={(event) => {
-            const rounded = Math.round(Number(event.currentTarget.value));
-            onChange({ ...exercise, restSeconds: Math.max(0, Number.isNaN(rounded) ? 0 : rounded) });
-          }}
+          onInput={(event) => onChange({ ...exercise, restSeconds: clampRoundedInput(event.currentTarget.value, 0) })}
         />
       </td>
       <td data-testid="exercise-time-cell">

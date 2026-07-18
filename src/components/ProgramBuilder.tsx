@@ -7,11 +7,11 @@ import MuscleGroupVolumeTable from './MuscleGroupVolumeTable';
 import RuleComplianceCard from './RuleComplianceCard';
 import SessionList from './SessionList';
 import { getGoalById, trainingGoals } from '../lib/data';
-import { parseStoredProgram } from '../lib/programFile';
+import { loadStoredProgram, saveProgram } from '../lib/programStore';
 import type { Program } from '../lib/types';
 import { LocaleProvider, useTranslation } from '../i18n/context';
-
-const STORAGE_KEY = 'volumen:program';
+import { hasTourBeenSeen } from '../lib/tourStore';
+import { startTour } from '../lib/tour';
 
 /**
  * Small page-level banner that echoes the homepage's typographic identity
@@ -23,7 +23,7 @@ const STORAGE_KEY = 'volumen:program';
 function AppIntro() {
   const { t } = useTranslation();
   return (
-    <div>
+    <div data-testid="app-intro">
       <p className="mb-1 font-mono text-xs font-semibold tracking-widest text-primary uppercase">
         {t('app.eyebrow')}
       </p>
@@ -32,19 +32,30 @@ function AppIntro() {
   );
 }
 
-function emptyProgram(): Program {
-  return { goalId: trainingGoals[0].id, sessions: [], marginMinutes: 0 };
+/**
+ * Auto-starts the guided tour on a visitor's first arrival on /app. Renders
+ * null and only exists so its effect runs inside the LocaleProvider tree
+ * (useTranslation() requires it), same reasoning as AppIntro above. The
+ * empty dependency array means it only ever fires once per mount, i.e. once
+ * per /app page load — by the time this effect runs, every sibling
+ * component in the tree has already committed to the DOM in the same pass,
+ * so every data-testid the tour targets already exists (see src/lib/tour.ts
+ * for why steps are still individually guarded against missing elements).
+ */
+function AppTourAutoStart() {
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    if (hasTourBeenSeen()) return;
+    startTour(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return null;
 }
 
-function loadProgram(): Program {
-  if (typeof window === 'undefined') return emptyProgram();
-  const stored = window.localStorage.getItem(STORAGE_KEY);
-  if (!stored) return emptyProgram();
-  try {
-    return parseStoredProgram(JSON.parse(stored)) ?? emptyProgram();
-  } catch {
-    return emptyProgram();
-  }
+function emptyProgram(): Program {
+  return { goalId: trainingGoals[0].id, sessions: [], marginMinutes: 0 };
 }
 
 export default function ProgramBuilder() {
@@ -52,13 +63,20 @@ export default function ProgramBuilder() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    setProgram(loadProgram());
-    setLoaded(true);
+    let cancelled = false;
+    loadStoredProgram().then((stored) => {
+      if (cancelled) return;
+      setProgram(stored ?? emptyProgram());
+      setLoaded(true);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
     if (!loaded) return;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(program));
+    saveProgram(program);
   }, [program, loaded]);
 
   const goal = getGoalById(program.goalId) ?? trainingGoals[0];
@@ -67,6 +85,7 @@ export default function ProgramBuilder() {
     <LocaleProvider>
       <div className="min-h-screen bg-base-200">
         <AppHeader />
+        <AppTourAutoStart />
         <main className="container mx-auto flex flex-col gap-6 px-4 py-6 sm:px-6">
           <AppIntro />
 

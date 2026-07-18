@@ -5,6 +5,26 @@ const en = {
 
   'localeSwitcher.label': 'Language',
 
+  'tour.startButton': 'Show me around',
+  'tour.next': 'Next',
+  'tour.previous': 'Back',
+  'tour.done': 'Done',
+  'tour.progress': '{{current}} of {{total}}',
+  'tour.intro.title': 'Your program',
+  'tour.intro.description': 'This is your training program, built entirely in your browser — nothing is sent anywhere.',
+  'tour.goalSelector.title': 'Training goal',
+  'tour.goalSelector.description':
+    'Pick strength, hypertrophy, power, or general health. It sets the volume and frequency targets checked below.',
+  'tour.sessions.title': 'Sessions',
+  'tour.sessions.description': 'Add sessions and exercises here. Each one contributes to the volume checks below.',
+  'tour.muscleGroupVolume.title': 'Muscle group volume',
+  'tour.muscleGroupVolume.description':
+    'Your weekly sets per muscle group, compared live against the recommended minimum for your goal.',
+  'tour.compliance.title': 'Volume rule compliance',
+  'tour.compliance.description': 'A pass/fail summary of every ACSM volume rule that applies to your goal.',
+  'tour.exportImport.title': 'Export / import',
+  'tour.exportImport.description': 'Save your program as a JSON file, or load one back in — no account needed.',
+
   'footer.about': 'About',
   'footer.legal': 'Legal notice',
 
@@ -178,6 +198,10 @@ const en = {
   'about.stack.item6': '<a href="https://playwright.dev/">Playwright</a> — end-to-end browser tests.',
   'about.stack.item7': '<a href="https://www.typescriptlang.org/">TypeScript</a> throughout.',
   'about.stack.item8':
+    '<a href="https://www.chartjs.org/">Chart.js</a> — the sets-per-muscle radar chart shown for the hypertrophy goal.',
+  'about.stack.item9':
+    '<a href="https://driverjs.com/">driver.js</a> — the guided tour introducing the app\'s interface on a visitor\'s first visit.',
+  'about.stack.item10':
     '<a href="https://www.anthropic.com/claude">Claude</a> (Anthropic), via <a href="https://claude.com/claude-code">Claude Code</a> — wrote the entire application, tests, and documentation, from natural-language prompts.',
 
   'about.sources.heading': 'Sources',

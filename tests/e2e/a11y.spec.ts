@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
-import { waitForHydration } from './helpers';
+import { seedTourSeen, waitForHydration } from './helpers';
 
 /**
  * Automated accessibility scan (axe-core) across the 5 routes, in both the
@@ -47,6 +47,10 @@ async function runAxe(page: Page, testInfo: TestInfo, route: string, theme: 'lig
 for (const route of ROUTES) {
   test(`axe scan: ${route} (light)`, async ({ page }, testInfo) => {
     await page.emulateMedia({ colorScheme: 'light' });
+    // These scans exercise the steady-state app UI, not the first-visit guided
+    // tour (covered separately by tests/e2e/tour.spec.ts), so seed the tour as
+    // already-seen to avoid its overlay/popover appearing in the axe scan.
+    if (route === '/app') await seedTourSeen(page);
     await page.goto(route);
     if (route === '/app') await waitForHydration(page);
     await runAxe(page, testInfo, route, 'light');
@@ -54,6 +58,7 @@ for (const route of ROUTES) {
 
   test(`axe scan: ${route} (dark)`, async ({ page }, testInfo) => {
     await page.emulateMedia({ colorScheme: 'dark' });
+    if (route === '/app') await seedTourSeen(page);
     await page.goto(route);
     if (route === '/app') await waitForHydration(page);
     await runAxe(page, testInfo, route, 'dark');

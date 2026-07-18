@@ -7,6 +7,30 @@ const fr: Partial<Record<TranslationKey, string>> = {
 
   'localeSwitcher.label': 'Langue',
 
+  'tour.startButton': 'Faire la visite guidée',
+  'tour.next': 'Suivant',
+  'tour.previous': 'Précédent',
+  'tour.done': 'Terminé',
+  'tour.progress': '{{current}} sur {{total}}',
+  'tour.intro.title': 'Votre programme',
+  'tour.intro.description':
+    'Voici votre programme d\'entraînement, construit entièrement dans votre navigateur — rien n\'est envoyé nulle part.',
+  'tour.goalSelector.title': 'Objectif d\'entraînement',
+  'tour.goalSelector.description':
+    'Choisissez force, hypertrophie, puissance ou santé générale. Cela définit les cibles de volume et de fréquence vérifiées plus bas.',
+  'tour.sessions.title': 'Séances',
+  'tour.sessions.description':
+    'Ajoutez des séances et des exercices ici. Chacune contribue aux vérifications de volume ci-dessous.',
+  'tour.muscleGroupVolume.title': 'Volume par groupe musculaire',
+  'tour.muscleGroupVolume.description':
+    'Vos séries hebdomadaires par groupe musculaire, comparées en direct au minimum recommandé pour votre objectif.',
+  'tour.compliance.title': 'Conformité au volume recommandé',
+  'tour.compliance.description':
+    'Un résumé de réussite/échec pour chaque règle de volume de l\'ACSM applicable à votre objectif.',
+  'tour.exportImport.title': 'Export / import',
+  'tour.exportImport.description':
+    'Enregistrez votre programme en fichier JSON, ou rechargez-en un — aucun compte nécessaire.',
+
   'footer.about': 'À propos',
   'footer.legal': 'Mentions légales',
 
@@ -185,6 +209,10 @@ const fr: Partial<Record<TranslationKey, string>> = {
   'about.stack.item6': '<a href="https://playwright.dev/">Playwright</a> — tests de bout en bout dans le navigateur.',
   'about.stack.item7': '<a href="https://www.typescriptlang.org/">TypeScript</a> partout.',
   'about.stack.item8':
+    '<a href="https://www.chartjs.org/">Chart.js</a> — le graphique radar des séries par muscle affiché pour l\'objectif hypertrophie.',
+  'about.stack.item9':
+    '<a href="https://driverjs.com/">driver.js</a> — la visite guidée qui présente l\'interface de l\'application lors d\'une première visite.',
+  'about.stack.item10':
     '<a href="https://www.anthropic.com/claude">Claude</a> (Anthropic), via <a href="https://claude.com/claude-code">Claude Code</a> — a écrit l\'intégralité de l\'application, des tests et de la documentation, à partir de prompts en langage naturel.',
 
   'about.sources.heading': 'Sources',

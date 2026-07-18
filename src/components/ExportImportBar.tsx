@@ -1,5 +1,5 @@
 import { useId, useRef, useState } from 'preact/hooks';
-import type { JSX } from 'preact';
+import type { TargetedEvent } from 'preact';
 import { buildProgramFile, parseProgramFile } from '../lib/programFile';
 import type { TrainingGoal } from '../lib/data';
 import type { Program } from '../lib/types';
@@ -17,8 +17,8 @@ export default function ExportImportBar({ program, goal, onImport }: ExportImpor
   const fileInputRef = useRef<HTMLInputElement>(null);
   const importId = useId();
 
-  function handleExport() {
-    const file = buildProgramFile(program, goal, locale);
+  async function handleExport() {
+    const file = await buildProgramFile(program, goal, locale);
     const blob = new Blob([JSON.stringify(file, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -28,13 +28,13 @@ export default function ExportImportBar({ program, goal, onImport }: ExportImpor
     URL.revokeObjectURL(url);
   }
 
-  async function handleImport(event: JSX.TargetedEvent<HTMLInputElement>) {
+  async function handleImport(event: TargetedEvent<HTMLInputElement>) {
     const inputFile = event.currentTarget.files?.[0];
     if (!inputFile) return;
 
     try {
       const json = JSON.parse(await inputFile.text());
-      const result = parseProgramFile(json, locale);
+      const result = await parseProgramFile(json, locale);
       if (result.ok) {
         onImport(result.program);
         setErrors([]);
@@ -49,7 +49,7 @@ export default function ExportImportBar({ program, goal, onImport }: ExportImpor
   }
 
   return (
-    <article className="card border border-base-300 bg-base-100">
+    <article className="card border border-base-300 bg-base-100" data-testid="export-import-card">
       <div className="card-body">
         <h2 className="card-title text-xl font-black tracking-tight">{t('exportImport.heading')}</h2>
         <div className="flex flex-wrap items-end gap-4">

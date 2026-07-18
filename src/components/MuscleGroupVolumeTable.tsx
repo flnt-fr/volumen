@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'preact/hooks';
-import { Chart, type ChartConfiguration } from 'chart.js/auto';
+import type { Chart as ChartType, ChartConfiguration } from 'chart.js/auto';
 import { formatSets, muscleGroupVolumeStatus } from '../lib/calculations';
 import type { TrainingGoal } from '../lib/data';
 import type { Program } from '../lib/types';
@@ -22,16 +22,24 @@ interface MuscleRadarChartProps {
   locale: Locale;
   actualLabel: string;
   minLabel: string;
+  ariaLabel: string;
 }
 
-function MuscleRadarChart({ rows, locale, actualLabel, minLabel }: MuscleRadarChartProps) {
+function MuscleRadarChart({ rows, locale, actualLabel, minLabel, ariaLabel }: MuscleRadarChartProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const chartRef = useRef<Chart | null>(null);
+  const chartRef = useRef<ChartType | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    // chart.js is a heavy dependency only needed for this radar chart
+    // (itself only rendered for the "hypertrophy" goal); loading it
+    // dynamically here keeps it out of the initial bundle of the page's
+    // single client:load island, which is what previously triggered the
+    // build's >500kB chunk-size warning.
+    let cancelled = false;
 
     const primaryColor = readColor('--color-primary') || '#1d6b4a';
     const errorColor = readColor('--color-error') || '#b3261e';
@@ -82,50 +90,60 @@ function MuscleRadarChart({ rows, locale, actualLabel, minLabel }: MuscleRadarCh
       },
     };
 
-    chartRef.current = new Chart(canvas, config);
-
-    // Chart.js's own `responsive: true` resize handling can get stuck at a
-    // stale size after the wrapper shrinks below its `max-width` and then
-    // grows back (e.g. narrowing then widening the viewport, or a tablet
-    // rotation): the canvas never regrows to fill the container again
-    // without an explicit resize nudge. Observe the wrapper directly and
-    // force a resize on every size change to keep the chart in sync.
-    //
-    // The resize must be deferred to the next animation frame rather than
-    // called synchronously inside the observer callback: `chart.resize()`
-    // changes the canvas's own height, and since the wrapper's height is
-    // itself derived from its content (the canvas), that change re-triggers
-    // the same observer within the same notification cycle. That synchronous
-    // feedback loop hits the browser's built-in ResizeObserver loop limit
-    // ("ResizeObserver loop completed with undelivered notifications") and
-    // gets cut off mid-resize, leaving the canvas stuck at an intermediate
-    // size. Deferring with requestAnimationFrame lets each notification
-    // cycle finish before we mutate the canvas, avoiding the loop entirely.
-    const wrapper = wrapperRef.current;
     let resizeObserver: ResizeObserver | undefined;
     let rafId: number | null = null;
-    if (wrapper && typeof ResizeObserver !== 'undefined') {
-      resizeObserver = new ResizeObserver((entries) => {
-        const entry = entries[0];
-        if (!entry) return;
-        const { width } = entry.contentRect;
-        if (rafId !== null) cancelAnimationFrame(rafId);
-        rafId = requestAnimationFrame(() => {
-          rafId = null;
-          if (width > 0) {
-            // Pass the observed width explicitly (with a 1:1 aspect ratio,
-            // matching the chart's default) rather than calling `resize()`
-            // with no arguments: Chart.js's own auto-detection re-reads the
-            // parent's bounding rect, which can still be stale right after
-            // the wrapper grows back from a narrower breakpoint.
-            chartRef.current?.resize(width, width);
-          }
+
+    import('chart.js/auto').then(({ Chart }) => {
+      // The effect's cleanup can run before this dynamic import resolves
+      // (e.g. rows/locale changing again, or the component unmounting,
+      // while the chart.js chunk is still loading) — bail out instead of
+      // building a chart nobody will ever clean up.
+      if (cancelled) return;
+
+      chartRef.current = new Chart(canvas, config);
+
+      // Chart.js's own `responsive: true` resize handling can get stuck at a
+      // stale size after the wrapper shrinks below its `max-width` and then
+      // grows back (e.g. narrowing then widening the viewport, or a tablet
+      // rotation): the canvas never regrows to fill the container again
+      // without an explicit resize nudge. Observe the wrapper directly and
+      // force a resize on every size change to keep the chart in sync.
+      //
+      // The resize must be deferred to the next animation frame rather than
+      // called synchronously inside the observer callback: `chart.resize()`
+      // changes the canvas's own height, and since the wrapper's height is
+      // itself derived from its content (the canvas), that change re-triggers
+      // the same observer within the same notification cycle. That synchronous
+      // feedback loop hits the browser's built-in ResizeObserver loop limit
+      // ("ResizeObserver loop completed with undelivered notifications") and
+      // gets cut off mid-resize, leaving the canvas stuck at an intermediate
+      // size. Deferring with requestAnimationFrame lets each notification
+      // cycle finish before we mutate the canvas, avoiding the loop entirely.
+      const wrapper = wrapperRef.current;
+      if (wrapper && typeof ResizeObserver !== 'undefined') {
+        resizeObserver = new ResizeObserver((entries) => {
+          const entry = entries[0];
+          if (!entry) return;
+          const { width } = entry.contentRect;
+          if (rafId !== null) cancelAnimationFrame(rafId);
+          rafId = requestAnimationFrame(() => {
+            rafId = null;
+            if (width > 0) {
+              // Pass the observed width explicitly (with a 1:1 aspect ratio,
+              // matching the chart's default) rather than calling `resize()`
+              // with no arguments: Chart.js's own auto-detection re-reads the
+              // parent's bounding rect, which can still be stale right after
+              // the wrapper grows back from a narrower breakpoint.
+              chartRef.current?.resize(width, width);
+            }
+          });
         });
-      });
-      resizeObserver.observe(wrapper);
-    }
+        resizeObserver.observe(wrapper);
+      }
+    });
 
     return () => {
+      cancelled = true;
       if (rafId !== null) cancelAnimationFrame(rafId);
       resizeObserver?.disconnect();
       chartRef.current?.destroy();
@@ -136,7 +154,7 @@ function MuscleRadarChart({ rows, locale, actualLabel, minLabel }: MuscleRadarCh
 
   return (
     <div className="mx-auto max-w-xl" ref={wrapperRef}>
-      <canvas ref={canvasRef} data-testid="muscle-group-volume-chart" role="img" />
+      <canvas ref={canvasRef} data-testid="muscle-group-volume-chart" role="img" aria-label={ariaLabel} />
     </div>
   );
 }
@@ -163,6 +181,7 @@ export default function MuscleGroupVolumeTable({ program, goal }: MuscleGroupVol
                   locale={locale}
                   actualLabel={t('muscleGroupVolume.chart.legend.actual')}
                   minLabel={t('muscleGroupVolume.chart.legend.min')}
+                  ariaLabel={t('muscleGroupVolume.caption')}
                 />
               </div>
             )}

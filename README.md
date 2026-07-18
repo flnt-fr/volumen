@@ -102,6 +102,44 @@ in AI-driven ("vibe") coding, not a reference architecture.
     consistently across all four tables in the app that share the same
     scroll-on-overflow pattern, not just the one that was reported.
 
+12. **Guided tour** — a request to introduce first-time visitors to `/app`
+    was implemented with **driver.js**: a tour covering only the parts of the
+    interface guaranteed to be visible on a first visit (deliberately
+    skipping conditional UI that doesn't exist yet, like the per-session
+    exercise editor), auto-started once per visitor via a `localStorage`
+    flag and replayable through a header button. A multi-agent review loop
+    caught a real bug live in the browser — clicking through the tour
+    quickly left a previous step's element still interactive underneath the
+    popover — fixed and pinned with a regression test. A follow-up prompt
+    trimmed the tour down to skip the header/footer steps.
+13. **Whole-project audit, second pass** — another dedicated review across
+    the entire codebase and its `.md` docs: fixed a case-sensitive exercise-
+    name matching bug, hardened `localStorage` writes that could throw
+    unhandled in private browsing, deduplicated a repeated locale-name
+    constant and a numeric-input clamp helper copied three times, added a
+    missing `aria-label` on the radar chart's canvas, and removed stray
+    leftover files (an empty file accidentally committed at the repo root,
+    an empty test directory) — plus refreshing this file and `HANDOFF.md` to
+    reflect the guided tour and current test counts.
+
+14. **Build-size fix** — a request to fix Vite's "chunks larger than 500 kB"
+    build warning was implemented by code-splitting `chart.js`, `driver.js`,
+    and `zod` behind dynamic `import()`s, and by discovering — rather than
+    assuming a library was to blame — that the actual biggest contributor was
+    the exercise database's unused `instructions` field (~70% of that file's
+    size), now stripped from the copy the app actually bundles. Validating
+    the fix against a real production build (not just the dev server) caught
+    a regression: dynamically importing driver.js's CSS specifically broke
+    in that build (a 404'ing, never-emitted chunk), silently disabling the
+    guided tour; fixed by keeping that one import static.
+15. **Type-check hints, actually resolved** — a request to fix `astro
+    check`'s remaining hints (accepted as false positives in earlier passes)
+    found real fixes for both: a deprecated Preact event type had an
+    undeprecated equivalent already available from a different import path,
+    and an inline script's `define:vars`-injected bindings just needed
+    declaring as ambient globals for the type checker to see them. Zero
+    hints now, instead of four accepted ones.
+
 Testing throughout was Vitest for the domain logic and i18n
 (`src/lib/*.test.ts`, `src/i18n/*.test.ts`) and Playwright for end-to-end
 flows and accessibility (`tests/e2e/*.spec.ts`), both driven by Claude, with
@@ -119,6 +157,8 @@ the human in the loop reviewing behavior rather than diffs line by line.
   `volumendark`) in `src/styles/theme.css`.
 - **[Chart.js](https://www.chartjs.org/)** — the sets-per-muscle radar
   chart shown for the hypertrophy goal.
+- **[driver.js](https://driverjs.com/)** — the guided tour introducing
+  `/app`'s interface on a visitor's first visit (replayable any time).
 - **[Zod](https://zod.dev/)** — schema validation for the localStorage
   program shape and the export/import JSON file format.
 - **[Vitest](https://vitest.dev/)** — unit tests for the domain logic and
@@ -148,7 +188,11 @@ the human in the loop reviewing behavior rather than diffs line by line.
   ([wrkout/exercises.json](https://github.com/wrkout/exercises.json)).
   Exercise names have a partial hand-authored French translation layer in
   `src/data/exercise-names.fr.json`, falling back to the original English
-  name where no translation exists yet.
+  name where no translation exists yet. The app itself imports
+  `src/data/exercices.app.json`, a generated copy
+  (`scripts/generate_app_exercises.py`) with the `instructions` field
+  stripped — it isn't used anywhere in the UI, and it alone accounted for
+  ~70% of the source file's size.
 
 ## License
 

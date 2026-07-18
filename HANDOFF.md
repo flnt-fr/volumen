@@ -41,9 +41,11 @@ direct browser interaction.
   hydration (avoiding a flash of English before the post-hydration French
   correction lands). It duplicates a minimal version of
   `localeStore.ts`'s resolution logic by hand (kept in sync manually,
-  documented in the file). `astro check` flags `Could not find name
-  'locales'` in this file as a hint — false positive: `locales` is bound via
-  the script's `define:vars`, which the type checker doesn't model.
+  documented in the file). `astro check` used to flag `Could not find name
+  'locales'` in this file as a hint (a false positive — `locales` is bound
+  via the script's `define:vars`, which the type checker doesn't model);
+  fixed by declaring the injected bindings as ambient globals in
+  `src/env.d.ts`, scoped to their real runtime types.
 - **i18n core** (`src/i18n/`):
   - `t.ts` / `strings.en.ts` / `strings.fr.ts` — the hand-rolled `t(locale,
     key, params)` lookup system (no i18n library), with an English fallback
@@ -65,6 +67,25 @@ direct browser interaction.
   `tests/e2e/a11y.spec.ts` scans all 5 routes × light/dark. Critical/serious
   violations fail the test; minor/moderate ones are attached to the report
   but non-blocking (documented rationale in the spec file).
+- **Guided tour** (`src/lib/tour.ts`, `src/lib/tourStore.ts`): a `driver.js`
+  onboarding tour of `/app`, scoped to that page only. Covers the 6 parts of
+  the UI guaranteed to be on screen on a first visit — intro, goal selector,
+  session list shell, muscle-group volume card, compliance card, export/
+  import bar (header/nav and footer were deliberately excluded, see the doc
+  comment at the top of `tour.ts`). Conditional UI (session editor, exercise
+  picker, per-session tables, the import-error alert) isn't covered since it
+  doesn't exist yet on a first visit. Auto-starts once per visitor
+  (`hasTourBeenSeen()`/`markTourAsSeen()` in `tourStore.ts`, a
+  `localStorage`-backed flag under `volumen:tourSeen`, same SSR-guarded
+  wrapper pattern as `localeStore.ts`), and can be replayed any time via the
+  "Show me around" button in `AppHeader.tsx`. Runs with `animate: false`
+  deliberately — driver.js ties its `.driver-active-element`/`pointer-events`
+  class swap to the highlight animation's completion, so clicking "Next"
+  faster than ~400ms left the previous step's element still interactive;
+  disabling the animation makes that swap synchronous (see the doc comment on
+  `startTour` in `tour.ts` for the full story, including the regression test
+  in `tests/e2e/tour.spec.ts` that drives through steps at a fast, fixed
+  cadence). i18n strings live under the `tour.*` namespace.
 - **Muscle-group volume radar chart**: `MuscleGroupVolumeTable.tsx` renders a
   Chart.js (`chart.js/auto`) radar chart of sets-per-muscle, shown only when
   `goal.id === 'hypertrophy'` (other goals just get the table). Colors are
@@ -88,10 +109,10 @@ direct browser interaction.
   interpolate the session name the way its two siblings do, and it's missing
   the `sr-only <caption>` the other three have — cosmetic drift from
   applying the same fix by hand at four call sites, not yet cleaned up.
-- **Tests** (run 2026-07-14): **Vitest 65/65** (`src/lib/**`, `src/i18n/**`),
-  **Playwright 32/32** (`tests/e2e/*.spec.ts`, up from 31 — a new keyboard-
-  reachability regression test for the muscle-group-volume table).
-  `tests/e2e/helpers.ts#gotoApp` navigates to `/app`.
+- **Tests** (run 2026-07-18): **Vitest 72/72** (`src/lib/**`, `src/i18n/**`),
+  **Playwright 40/40** (`tests/e2e/*.spec.ts`), including the guided-tour
+  suite (`tour.spec.ts`) and a case-insensitive exercise-match regression
+  (`full-flow.spec.ts`). `tests/e2e/helpers.ts#gotoApp` navigates to `/app`.
 
 ## How this was built
 
@@ -155,6 +176,66 @@ Same pattern as the `mobile-app*.png` files removed in the earlier pass —
 harmless (untracked, gitignored or not, don't affect the app) but stray;
 left for a cleanup pass since this doc-sync task is documentation-only.
 
+**Latest pass (2026-07-18)**: added the driver.js guided tour (see "Guided
+tour" above), then a follow-up whole-project audit and cleanup —
+- Fixed a real bug in `ExercisePicker.tsx`: the "add exercise" button stayed
+  disabled if the visitor typed a known exercise's name with different
+  casing than the `<datalist>` (e.g. "bench press" vs "Bench Press"), with no
+  error message explaining why. Matching is now case-insensitive; covered by
+  a new Playwright regression test in `full-flow.spec.ts`.
+- `ProgramBuilder.tsx`'s inline, unguarded `localStorage.setItem` (no
+  try/catch, unlike `loadProgram`'s read side) was extracted into a
+  dedicated `src/lib/programStore.ts`, mirroring `tourStore.ts`/
+  `localeStore.ts`'s SSR-guarded wrapper pattern, and now swallows
+  quota/availability errors instead of throwing on every keystroke in
+  private browsing or when storage is full.
+- Deduplicated `LOCALE_NAMES` (was defined identically in both
+  `AppHeader.tsx` and `LocaleSelect.tsx`) into `src/i18n/types.ts`, and
+  extracted the repeated sets/rest/margin-input clamp-and-round logic (three
+  near-identical copies across `ExerciseRow.tsx` ×2 and `SessionList.tsx`)
+  into `src/lib/numberInput.ts#clampRoundedInput`.
+- Added a missing `aria-label` on the muscle-group volume radar chart's
+  `<canvas role="img">` (was invisible to screen readers despite the
+  `role="img"`), reusing the existing `muscleGroupVolume.caption` string.
+- Removed a stray, empty `grep` file accidentally committed at the repo root
+  in an earlier session, and an empty leftover `tests/e2e/debug/` directory.
+- Re-verified `astro check` (0 errors/0 warnings/4 hints, same as before),
+  Vitest, and Playwright all pass after the above (counts in "Tests" above).
+  The 4 hints were later fixed for real, see the 2026-07-18 pass below.
+
+**Latest pass (2026-07-18, later same day)**: two parallel follow-ups —
+- A live QA pass drove the running app (fallback: the full Playwright suite,
+  since the `playwright` MCP browser couldn't launch in this sandbox — a
+  `LD_LIBRARY_PATH` pollution issue, not an app defect) through every major
+  flow (goal/session/exercise editing, export/import round-trip and invalid-
+  file handling, the guided tour, i18n persistence across pages, mobile
+  viewport, static-page navigation). No functional defects found.
+- The Vite chunk-size warning was fixed for real (see "Known non-blocking
+  items" below for the technical detail) — code-splitting `chart.js`,
+  `driver.js`, and `zod`, plus stripping the exercise database's unused
+  `instructions` field, which was the actual dominant contributor. Caught and
+  fixed a regression along the way where a dynamically-imported CSS file
+  404'd in the production build specifically (not `astro dev`), breaking the
+  guided tour silently — a good reminder to validate build-warning fixes
+  against a real `astro build && astro preview`, not just the dev server.
+
+**Latest pass (2026-07-18, later still)**: fixed the four `astro check`
+hints that earlier passes had accepted as false positives rather than
+actually resolving —
+- `JSX.TargetedEvent` deprecation in `ExercisePicker.tsx`/`ExportImportBar.tsx`:
+  the deprecation message ("import from the Preact namespace instead") turned
+  out to be accurate, just not obviously so — `TargetedEvent` is re-exported,
+  undeprecated, from `preact`'s own `dom.d.ts` (merged into the package root
+  via `export * from './dom'` in `index.d.ts`), as opposed to the deprecated
+  copy on the `JSX` namespace. Both files now `import type { TargetedEvent }
+  from 'preact'` instead of using `JSX.TargetedEvent`.
+- `Could not find name 'locales'` in `LocaleFOUCScript.astro`: added
+  `src/env.d.ts` declaring the script's `define:vars`-injected bindings
+  (`locales`, `defaultLocale`, `storageKey`, `frStrings`) as ambient globals
+  with their real runtime types, which `astro check` can't otherwise infer
+  since the script is `is:inline` (unprocessed, per Astro's own docs).
+`astro check` is now 0 errors/0 warnings/0 hints.
+
 ## Running it
 
 ```bash
@@ -180,6 +261,23 @@ npx astro build                # production build
 - No adapter/SSR — static output only, everything is client-side.
 - No URL routing for locale (no `/en/`, `/fr/`) — intentional,
   `localStorage`-driven toggle, consistent with the rest of the app's state.
-- `npm run build` prints a Vite "chunks larger than 500 kB" warning (mainly
-  Chart.js). Not an error; left un-code-split since it's a small
-  client-only app and this wasn't in scope for this pass.
+- ~~`npm run build` prints a Vite "chunks larger than 500 kB" warning~~ —
+  **fixed**. Three changes: `chart.js/auto` and `driver.js`'s JS runtime are
+  now loaded via dynamic `import()` (in `MuscleGroupVolumeTable.tsx` and
+  `src/lib/tour.ts` respectively) instead of bundled eagerly into `/app`'s
+  single `client:load` island; `zod`'s schemas are similarly built lazily on
+  first use (`src/lib/programFile.ts#getSchemas`) rather than at module load.
+  The biggest single contributor turned out not to be a library at all but
+  `src/data/exercices.json`'s unused `instructions` field (~70% of that
+  940 kB file, confirmed unreferenced anywhere in the app) — the app now
+  imports a generated, stripped copy (`src/data/exercices.app.json`, via
+  `scripts/generate_app_exercises.py`) instead, dropping the main chunk from
+  868 kB to 284 kB. One pitfall hit along the way: dynamically importing
+  `driver.js/dist/driver.css` (as opposed to the JS runtime) broke in the
+  *production* build specifically — Astro/Vite emitted a
+  `<link rel="modulepreload">` for a CSS chunk that was never actually
+  written to `dist/_astro/`, 404'ing and silently breaking `startTour()`
+  (caught by `tests/e2e/tour.spec.ts` failing against a real preview-server
+  build, not `astro dev`). At 4 kB, that CSS wasn't worth lazy-loading
+  anyway; it's a static import again, only the JS runtime is dynamic. All
+  chunks are now under 500 kB and `npm run build` is warning-free.

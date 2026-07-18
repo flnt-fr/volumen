@@ -1,5 +1,5 @@
 import { useId, useMemo, useState } from 'preact/hooks';
-import type { JSX } from 'preact';
+import type { TargetedEvent } from 'preact';
 import { exercises } from '../lib/data';
 import { useTranslation } from '../i18n/context';
 import { getExerciseName } from '../i18n/exerciseNames';
@@ -13,8 +13,11 @@ export default function ExercisePicker({ onAdd }: ExercisePickerProps) {
   const [value, setValue] = useState('');
   const listId = useId();
 
-  const exercisesByName = useMemo(
-    () => new Map(exercises.map((exercise) => [getExerciseName(exercise, locale), exercise.id])),
+  // Keyed by lowercase name so a match doesn't depend on the visitor typing
+  // the exact casing shown in the <datalist> (e.g. "bench press" should match
+  // "Bench Press" just as well as picking it from the suggestions does).
+  const exercisesByNormalizedName = useMemo(
+    () => new Map(exercises.map((exercise) => [getExerciseName(exercise, locale).toLowerCase(), exercise.id])),
     [locale],
   );
   const exerciseOptions = useMemo(
@@ -23,8 +26,8 @@ export default function ExercisePicker({ onAdd }: ExercisePickerProps) {
   );
 
   const trimmedValue = value.trim();
-  const isKnownExercise = exercisesByName.has(trimmedValue);
   const normalizedValue = trimmedValue.toLowerCase();
+  const isKnownExercise = exercisesByNormalizedName.has(normalizedValue);
   const isPartialMatch = useMemo(
     () =>
       normalizedValue.length > 0 &&
@@ -37,9 +40,9 @@ export default function ExercisePicker({ onAdd }: ExercisePickerProps) {
   // partial name while the <datalist> is still showing live suggestions.
   const hasNoMatch = trimmedValue.length > 0 && !isKnownExercise && !isPartialMatch;
 
-  function handleSubmit(event: JSX.TargetedEvent<HTMLFormElement>) {
+  function handleSubmit(event: TargetedEvent<HTMLFormElement>) {
     event.preventDefault();
-    const exerciseId = exercisesByName.get(trimmedValue);
+    const exerciseId = exercisesByNormalizedName.get(normalizedValue);
     if (!exerciseId) return;
     onAdd(exerciseId);
     setValue('');
