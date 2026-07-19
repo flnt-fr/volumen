@@ -223,21 +223,21 @@ const fr: Partial<Record<TranslationKey, string>> = {
 
   'about.license.heading': 'Licence',
   'about.license.body':
-    'Le code de l\'application est sous licence MIT. Cette licence ne s\'étend pas aux données tierces embarquées dans l\'application — la base d\'exercices est dans le domaine public (Unlicense) et créditée ci-dessus par courtoisie, tandis que les données d\'objectifs d\'entraînement de l\'ACSM sont un résumé condensé d\'une publication scientifique protégée par le droit d\'auteur, utilisées comme instantané de référence dans l\'application plutôt que comme donnée librement redistribuable. Voir le <a href="https://github.com/flnt-fr/volumen">dépôt source</a> du projet et ses fichiers <code>README.md</code> et <code>LICENSE</code> pour tous les détails, ainsi que les <a href="/legal">mentions légales</a> pour les informations d\'éditeur et d\'hébergeur.',
+    'Le code de l\'application est sous licence MIT. Cette licence ne s\'étend pas aux données tierces embarquées dans l\'application — la base d\'exercices est dans le domaine public (Unlicense) et créditée ci-dessus par courtoisie, tandis que les données d\'objectifs d\'entraînement de l\'ACSM sont un résumé condensé d\'une publication scientifique protégée par le droit d\'auteur, utilisées comme instantané de référence dans l\'application plutôt que comme donnée librement redistribuable. Voir le <a href="https://github.com/hex46/volumen">dépôt source</a> du projet et ses fichiers <code>README.md</code> et <code>LICENSE</code> pour tous les détails, ainsi que les <a href="/legal">mentions légales</a> pour les informations d\'éditeur et d\'hébergeur.',
 
   'legal.heading': 'Mentions légales',
   'legal.intro':
     'Cette page constitue les mentions légales requises par la loi française (LCEN, art. 6-III) pour un site publié depuis la France.',
   'legal.publisher.heading': 'Éditeur',
   'legal.publisher.body':
-    'Ce site est publié à titre personnel et non professionnel par Florent A.<br />Contact : <a href="mailto:volumen@flnt.fr">volumen@flnt.fr</a>',
+    'Ce site est publié à titre personnel et non professionnel par Florent A.<br />Contact : <a href="mailto:volumen@hex46.fr">volumen@hex46.fr</a>',
   'legal.publisher.director': 'Directeur de la publication : Florent A.',
   'legal.hosting.heading': 'Hébergeur',
   'legal.hosting.body':
     'Ce site est hébergé sur un serveur privé virtuel exploité par :<br />OVH SAS — capital de 50 000 000 €<br />2 rue Kellermann, 59100 Roubaix, France<br />RCS Lille Métropole 424 761 419 00045',
   'legal.ip.heading': 'Propriété intellectuelle',
   'legal.ip.body':
-    'Le code de l\'application est publié sous licence MIT. Il embarque des données tierces sous leurs propres conditions distinctes (une base d\'exercices ouverte dans le domaine public, et un résumé condensé d\'une publication scientifique protégée par le droit d\'auteur). Tous les détails, crédits et textes de licence sont disponibles dans le <a href="https://github.com/flnt-fr/volumen">dépôt source</a> du projet et ses fichiers <code>README.md</code>/<code>LICENSE</code>.',
+    'Le code de l\'application est publié sous licence MIT. Il embarque des données tierces sous leurs propres conditions distinctes (une base d\'exercices ouverte dans le domaine public, et un résumé condensé d\'une publication scientifique protégée par le droit d\'auteur). Tous les détails, crédits et textes de licence sont disponibles dans le <a href="https://github.com/hex46/volumen">dépôt source</a> du projet et ses fichiers <code>README.md</code>/<code>LICENSE</code>.',
   'legal.personalData.heading': 'Données personnelles',
   'legal.personalData.body':
     'Volumen fonctionne entièrement dans votre navigateur. Il n\'y a ni serveur, ni compte utilisateur, ni suivi analytique, ni cookie. Le programme d\'entraînement que vous construisez est stocké uniquement dans le <code>localStorage</code> de votre navigateur et n\'est jamais transmis à, ni vu par, l\'éditeur ou l\'hébergeur. Effacer les données de site de votre navigateur le supprime définitivement. Aucune donnée personnelle n\'étant collectée ni traitée par l\'éditeur, aucune relation de responsable de traitement n\'est établie et il n\'y a rien à demander d\'accéder, de corriger ou de supprimer de notre côté.',

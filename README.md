@@ -233,7 +233,7 @@ npm run build      # production build
 ## Deployment
 
 Volumen builds to a fully static site (`astro build` → `dist/`, no server,
-no adapter) and is deployed at **volumen.flnt.fr** as a static site on
+no adapter) and is deployed at **volumen.hex46.fr** as a static site on
 [Coolify](https://coolify.io/), with no Dockerfile involved:
 
 - **Build command**: `npm run build`

@@ -29,7 +29,7 @@ test('/about links back to the app and to the source repository', async ({ page 
   await expect(page.getByRole('heading', { level: 1, name: 'About Volumen' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'source repository' })).toHaveAttribute(
     'href',
-    'https://github.com/flnt-fr/volumen',
+    'https://github.com/hex46/volumen',
   );
 
   await page.getByRole('link', { name: 'Open the app' }).click();
@@ -40,9 +40,9 @@ test('/legal links back to the app and lists publisher and hosting details', asy
   await page.goto('/legal');
 
   await expect(page.getByRole('heading', { level: 1, name: 'Legal notice' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'volumen@flnt.fr' })).toHaveAttribute(
+  await expect(page.getByRole('link', { name: 'volumen@hex46.fr' })).toHaveAttribute(
     'href',
-    'mailto:volumen@flnt.fr',
+    'mailto:volumen@hex46.fr',
   );
   await expect(page.getByText('OVH SAS', { exact: false })).toBeVisible();
 

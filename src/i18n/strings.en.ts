@@ -212,21 +212,21 @@ const en = {
 
   'about.license.heading': 'License',
   'about.license.body':
-    'The application code is MIT-licensed. That license does not extend to the third-party data bundled with the app — the exercise database is public domain (Unlicense) and credited above out of courtesy, while the ACSM training-goal data is a condensed summary of a copyrighted scientific publication, used as a reference snapshot within the app rather than freely redistributable data. See the <a href="https://github.com/flnt-fr/volumen">source repository</a>\'s <code>README.md</code> and <code>LICENSE</code> files for full details, and the <a href="/legal">legal notice</a> for publisher and hosting information.',
+    'The application code is MIT-licensed. That license does not extend to the third-party data bundled with the app — the exercise database is public domain (Unlicense) and credited above out of courtesy, while the ACSM training-goal data is a condensed summary of a copyrighted scientific publication, used as a reference snapshot within the app rather than freely redistributable data. See the <a href="https://github.com/hex46/volumen">source repository</a>\'s <code>README.md</code> and <code>LICENSE</code> files for full details, and the <a href="/legal">legal notice</a> for publisher and hosting information.',
 
   'legal.heading': 'Legal notice',
   'legal.intro':
     'This page is provided as the legal notice ("mentions légales") required under French law (LCEN, art. 6-III) for a website published from France.',
   'legal.publisher.heading': 'Publisher',
   'legal.publisher.body':
-    'This site is published on a non-professional, personal basis by Florent A.<br />Contact: <a href="mailto:volumen@flnt.fr">volumen@flnt.fr</a>',
+    'This site is published on a non-professional, personal basis by Florent A.<br />Contact: <a href="mailto:volumen@hex46.fr">volumen@hex46.fr</a>',
   'legal.publisher.director': 'Publication director: Florent A.',
   'legal.hosting.heading': 'Hosting provider',
   'legal.hosting.body':
     'This site is hosted on a virtual private server operated by:<br />OVH SAS — capital of €50,000,000<br />2 rue Kellermann, 59100 Roubaix, France<br />RCS Lille Métropole 424 761 419 00045',
   'legal.ip.heading': 'Intellectual property',
   'legal.ip.body':
-    'The application code is released under the MIT license. It bundles third-party data under their own, separate terms (an open exercise database released into the public domain, and a condensed summary of a copyrighted scientific publication). Full details, credits, and license text are available in the project\'s <a href="https://github.com/flnt-fr/volumen">source repository</a> and its <code>README.md</code>/<code>LICENSE</code> files.',
+    'The application code is released under the MIT license. It bundles third-party data under their own, separate terms (an open exercise database released into the public domain, and a condensed summary of a copyrighted scientific publication). Full details, credits, and license text are available in the project\'s <a href="https://github.com/hex46/volumen">source repository</a> and its <code>README.md</code>/<code>LICENSE</code> files.',
   'legal.personalData.heading': 'Personal data',
   'legal.personalData.body':
     'Volumen runs entirely in your browser. It has no backend, no user accounts, no analytics, and sets no cookies. The training program you build is stored only in your browser\'s <code>localStorage</code> and is never transmitted to, or seen by, the publisher or the hosting provider. Clearing your browser\'s site data removes it permanently. Because no personal data is collected or processed by the publisher, no data-controller relationship is established and there is nothing to request access to, correct, or delete on our end.',
