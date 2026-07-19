@@ -30,7 +30,7 @@
     "@playwright/test": "^1.61.1",
     "@tailwindcss/typography": "^0.5.20",
     "@types/node": "^26.1.1",
-    "happy-dom": "^20.10.6",
+    "happy-dom": "^20.11.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"
   }
